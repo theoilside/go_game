@@ -1,6 +1,8 @@
 import tkinter as tk
 from PIL import ImageTk, Image
-from go import Game, TypesOfGames
+
+from ReqestResponse import StartGameResponse, MakeMoveByPlayerResponse
+from go import MultiplayerGame, SingleplayerGame, TypesOfGames, Colors
 
 # Root settings
 WIDTH = 1080
@@ -13,11 +15,11 @@ BUTTON_PRESSED_COLOR = '#B88B5E'
 
 class GameSettings:
     def __init__(self):
-        self.size = 9
-        self.player_count = 1
+        self.size: int = 9
+        self.game_type: TypesOfGames = TypesOfGames.singleplayer
+        self.current_turn_color: Colors = Colors.black
 
 
-is_white_turn = True  # TODO: Заглушка, убрать
 window = tk.Tk()
 
 # Bg images
@@ -56,9 +58,11 @@ class Display:
 
         choose_player_count = self.create_label('Выберете режим игры', game_players_count_frame, width=20)
         singleplayer_button = self.create_button('С компьютером', game_players_count_frame,
-                                                 callback=lambda: self.save_chosen_player_count(1))
+                                                 callback=lambda: self.save_chosen_player_count(
+                                                     TypesOfGames.singleplayer))
         multiplayer_button = self.create_button('Два игрока', game_players_count_frame,
-                                                callback=lambda: self.save_chosen_player_count(2))
+                                                callback=lambda: self.save_chosen_player_count(
+                                                    TypesOfGames.multiplayer))
 
         # Game size
         game_size_frame = self.create_menu_frame()
@@ -119,8 +123,8 @@ class Display:
         menu_frame.pack_propagate(False)
         return menu_frame
 
-    def save_chosen_player_count(self, count):
-        self.game_settings.player_count = count
+    def save_chosen_player_count(self, game_type: TypesOfGames):
+        self.game_settings.game_type = game_type
         self.change_frame(self.game_players_count_frame, self.game_size_frame)
 
     @staticmethod
@@ -133,8 +137,13 @@ class Display:
 
     def save_chosen_field_size(self, size):
         self.game_settings.size = size
-        self.game = Game()
-        self.game.start_new_game(self.game_settings.size, TypesOfGames.multiplayer)
+        self.game = SingleplayerGame() if self.game_settings.game_type == TypesOfGames.singleplayer else MultiplayerGame()
+
+        start_game_response: StartGameResponse = self.game.start_new_game(self.game_settings.size)
+        if not start_game_response.is_success:
+            raise 'Невозомжно начать игру'
+        self.game_settings.current_turn_color = start_game_response.current_turn
+
         self.game_field_ceil = self.init_game_field()
         self.change_frame(self.game_size_frame, self.game_frame)
 
@@ -160,15 +169,18 @@ class Display:
         return game_field_ceil
 
     def on_game_cell_pressed(self, row, column):
-        # TODO: Отправить запрос на нажатие по клетке поля. Получить ответ и отобразить результат.
-        global is_white_turn
+        make_move_player_response: MakeMoveByPlayerResponse = self.game.place_piece(x=column, y=row)
+        if not make_move_player_response.is_success:
+            raise 'Нельзя сделать такой ход'
 
         # Пока отображаем как для игры двух человек
-        self.game_field_ceil[row][column].configure(image=white_ceil if is_white_turn else black_ceil)
+        self.game_field_ceil[row][column].configure(
+            image=white_ceil if self.game_settings.current_turn_color == Colors.white else black_ceil)
 
-        # Убрать
-        is_white_turn = not is_white_turn
-        self.state.configure(text=f'Сейчас ходит {"белый" if is_white_turn else "чёрный"} игрок')
+        self.game_settings.current_turn_color = make_move_player_response.current_turn
+
+        self.state.configure(
+            text=f'Сейчас ходит {"белый" if self.game_settings.current_turn_color == Colors.white else "чёрный"} игрок')
 
 
 display = Display(window)

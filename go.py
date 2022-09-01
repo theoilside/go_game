@@ -35,7 +35,7 @@ class Game:
         self.board = Board(size)
 
     def place_piece(self, x, y):
-        self.board.place_piece(self.color_of_current_move, x, y)
+        self.board.place_piece(x, y)
         self.color_of_current_move = self.color_of_current_move.get_opposite()
 
 
@@ -54,7 +54,7 @@ class SingleplayerGame(Game):
 
     def make_ai_move(self):
         x, y = self.AI.get_move()
-        self.place_piece(self.color_of_AI, x, y)
+        self.place_piece(x, y)
         return x, y
 
 
