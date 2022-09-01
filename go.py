@@ -76,11 +76,13 @@ class Board:
 
     def __str__(self):
         array = []
+
         for row in self.board:
             for element in row:
                 array.append(str(element))
             array.append('\n')
         return ''.join(array)
+
 
     def generate_starting_board(self):
         board = [[TypesOfCells.border] * self.size_with_borders]

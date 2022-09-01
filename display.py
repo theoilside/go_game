@@ -169,7 +169,7 @@ class Display:
         return game_field_ceil
 
     def on_game_cell_pressed(self, row, column):
-        make_move_player_response: MakeMoveByPlayerResponse = self.game.place_piece(x=column, y=row)
+        make_move_player_response: MakeMoveByPlayerResponse = self.game.make_player_move(x=column, y=row)
         if not make_move_player_response.is_success:
             raise 'Нельзя сделать такой ход'
 
