@@ -9,8 +9,8 @@ class StartGameResponse:
 
 class MakeMoveByPlayerResponse:
     def __init__(self, is_success: bool, current_turn: Colors):
-        self.current_turn: Colors = current_turn
         self.is_success: bool = is_success
+        self.current_turn: Colors = current_turn
 
 
 class MakeMoveByAIResponse:

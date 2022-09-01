@@ -2,6 +2,8 @@ import math
 from enum import Enum
 import random
 
+import ReqestResponse
+
 
 class Colors(Enum):
     white = 'white'
@@ -25,10 +27,15 @@ class Game:
 
     def start_new_game(self, size):
         self.board = Board(size)
+        return ReqestResponse.StartGameResponse(True, Colors.black)
 
     def place_piece(self, x, y):
         self.board.place_piece(x, y)
         self.color_of_current_move = self.color_of_current_move.get_opposite()
+
+    def make_player_move(self, x, y):
+        self.place_piece(x, y)
+        return ReqestResponse.MakeMoveByPlayerResponse(True, self.color_of_current_move)
 
 
 class SingleplayerGame(Game):
@@ -39,15 +46,15 @@ class SingleplayerGame(Game):
         self.AI = None
 
     def start_new_game(self, size, color_of_human: Colors = 'black'):
-        super().start_new_game(size)
         self.color_of_human = color_of_human
         self.color_of_AI = color_of_human.get_opposite()
         self.AI = AI(self.board)
+        return super().start_new_game(size)
 
     def make_ai_move(self):
         x, y = self.AI.get_move()
         self.place_piece(x, y)
-        return x, y
+        return ReqestResponse.MakeMoveByAIResponse(x, y, self.color_of_current_move)
 
 
 class MultiplayerGame(Game):
@@ -55,7 +62,7 @@ class MultiplayerGame(Game):
         super().__init__()
 
     def start_new_game(self, size):
-        super().start_new_game(size)
+        return super().start_new_game(size)
 
 
 class AI:
