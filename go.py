@@ -143,6 +143,9 @@ class Cell:
     def __init__(self, type: TypesOfCells):
         self.type = type
 
+    def __str__(self):
+        return str(self.type)
+
 
 if __name__ == '__main__':
     game = SingleplayerGame()

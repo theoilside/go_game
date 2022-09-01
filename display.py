@@ -1,7 +1,7 @@
 import tkinter as tk
 from PIL import ImageTk, Image
 
-from ReqestResponse import StartGameResponse, MakeMoveByPlayerResponse
+from ReqestResponse import StartGameResponse, MakeMoveByPlayerResponse, MakeMoveByAIResponse
 from go import MultiplayerGame, SingleplayerGame, TypesOfGames, Colors
 
 # Root settings
@@ -143,6 +143,11 @@ class Display:
         if not start_game_response.is_success:
             raise 'Невозомжно начать игру'
         self.game_settings.current_turn_color = start_game_response.current_turn
+        if self.game_settings.game_type == TypesOfGames.multiplayer:
+            self.state.configure(
+                text=f'Сейчас ходит {"белый" if self.game_settings.current_turn_color == Colors.white else "чёрный"} игрок')
+        else:
+            self.state.configure(text='Вы играете за чёрных')
 
         self.game_field_ceil = self.init_game_field()
         self.change_frame(self.game_size_frame, self.game_frame)
@@ -179,8 +184,16 @@ class Display:
 
         self.game_settings.current_turn_color = make_move_player_response.current_turn
 
-        self.state.configure(
-            text=f'Сейчас ходит {"белый" if self.game_settings.current_turn_color == Colors.white else "чёрный"} игрок')
+        if self.game_settings.game_type == TypesOfGames.multiplayer:
+            self.state.configure(
+                text=f'Сейчас ходит {"белый" if self.game_settings.current_turn_color == Colors.white else "чёрный"} игрок')
+
+        if self.game_settings.game_type == TypesOfGames.singleplayer:
+            make_move_by_ai_response: MakeMoveByAIResponse = self.game.make_ai_move()
+            self.game_field_ceil[make_move_by_ai_response.y][make_move_by_ai_response.x].configure(
+                image=white_ceil if self.game_settings.current_turn_color == Colors.white else black_ceil)
+
+            self.game_settings.current_turn_color = make_move_by_ai_response.current_turn
 
 
 display = Display(window)
