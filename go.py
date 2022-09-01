@@ -1,22 +1,7 @@
 import math
-from enum import Enum
 import random
-from ReqestResponse import *
-
-
-class Colors(Enum):
-    white = 'white'
-    black = 'black'
-
-    def get_opposite(self):
-        if self.value == 'white':
-            return 'black'
-        return 'white'
-
-
-class TypesOfGames(Enum):
-    singleplayer = 'singleplayer'
-    multiplayer = 'multiplayer'
+from enums import *
+import ReqestResponse
 
 
 class Game:
@@ -26,7 +11,7 @@ class Game:
 
     def start_new_game(self, size):
         self.board = Board(size)
-        return StartGameResponse(True, Colors.black)
+        return ReqestResponse.StartGameResponse(True, Colors.black)
 
     def place_piece(self, x, y):
         self.board.place_piece(x, y)
@@ -34,7 +19,7 @@ class Game:
 
     def make_player_move(self, x, y):
         self.place_piece(x, y)
-        return MakeMoveByPlayerResponse(True, self.color_of_current_move)
+        return ReqestResponse.MakeMoveByPlayerResponse(True, self.color_of_current_move)
 
 
 class SingleplayerGame(Game):
@@ -53,7 +38,7 @@ class SingleplayerGame(Game):
     def make_ai_move(self):
         x, y = self.AI.get_move()
         self.place_piece(x, y)
-        return MakeMoveByAIResponse(x, y, self.color_of_current_move)
+        return ReqestResponse.MakeMoveByAIResponse(x, y, self.color_of_current_move)
 
 
 class MultiplayerGame(Game):
@@ -151,19 +136,6 @@ class Board:
         #     liberties.append(square)
 
 
-class TypesOfCells(Enum):
-    black = 'b'
-    white = 'w'
-    empty = '.'
-    border = 'x'
-
-    def __str__(self):
-        return self.value
-
-    def __repr__(self):
-        return self.value
-
-
 class Cell:
     def __init__(self, type: TypesOfCells):
         self.type = type
@@ -183,7 +155,6 @@ inputted_size = input()
 if int(inputted_size) < 2:
     raise 'Неправильный размер!'
 game.start_new_game(int(inputted_size), color_of_human)
-print('1')
 while True:
     print(game.board)
     print('Напиши свой ход в формате «x,y», где «x» и «y» — координаты')

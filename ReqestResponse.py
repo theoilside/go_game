@@ -1,4 +1,4 @@
-from go import Colors
+from enums import *
 
 
 class StartGameResponse:
