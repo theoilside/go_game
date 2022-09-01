@@ -27,7 +27,7 @@ class Game:
         self.board = Board(size)
 
     def place_piece(self, x, y):
-        self.board.place_piece(self.color_of_current_move, x, y)
+        self.board.place_piece(x, y)
         self.color_of_current_move = self.color_of_current_move.get_opposite()
 
 
