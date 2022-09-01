@@ -29,7 +29,7 @@ class SingleplayerGame(Game):
         self.color_of_AI = None
         self.AI = None
 
-    def start_new_game(self, size, color_of_human: Colors = 'black'):
+    def start_new_game(self, size, color_of_human: Colors = Colors.black):
         self.color_of_human = color_of_human
         self.color_of_AI = color_of_human.get_opposite()
         response = super().start_new_game(size)
@@ -144,23 +144,24 @@ class Cell:
         self.type = type
 
 
-game = SingleplayerGame()
-print('Напиши, каким цветом хочешь играть — «b» или «w». Первыми ходят черные')
-inputted_color = input()
-if inputted_color == 'w':
-    color_of_human = Colors.white
-elif inputted_color == 'b':
-    color_of_human = Colors.black
-else:
-    raise 'Неправильный цвет!'
-print('Напиши размер поля')
-inputted_size = input()
-if int(inputted_size) < 2:
-    raise 'Неправильный размер!'
-game.start_new_game(int(inputted_size), color_of_human)
-while True:
-    print(game.board)
-    print('Напиши свой ход в формате «x,y», где «x» и «y» — координаты')
-    inputted_coords = input().split(',')
-    game.place_piece(int(inputted_coords[0]), int(inputted_coords[1]))
-    game.make_ai_move()
+if __name__ == '__main__':
+    game = SingleplayerGame()
+    print('Напиши, каким цветом хочешь играть — «b» или «w». Первыми ходят черные')
+    inputted_color = input()
+    if inputted_color == 'w':
+        color_of_human = Colors.white
+    elif inputted_color == 'b':
+        color_of_human = Colors.black
+    else:
+        raise 'Неправильный цвет!'
+    print('Напиши размер поля')
+    inputted_size = input()
+    if int(inputted_size) < 2:
+        raise 'Неправильный размер!'
+    game.start_new_game(int(inputted_size), color_of_human)
+    while True:
+        print(game.board)
+        print('Напиши свой ход в формате «x,y», где «x» и «y» — координаты')
+        inputted_coords = input().split(',')
+        game.place_piece(int(inputted_coords[0]), int(inputted_coords[1]))
+        game.make_ai_move()

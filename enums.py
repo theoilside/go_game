@@ -7,8 +7,8 @@ class Colors(Enum):
 
     def get_opposite(self):
         if self.value == 'white':
-            return 'black'
-        return 'white'
+            return Colors.black
+        return Colors.white
 
 
 class TypesOfGames(Enum):

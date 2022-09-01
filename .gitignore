@@ -120,6 +120,8 @@ venv.bak/
 .idea/dictionaries
 .idea/vcs.xml
 .idea/jsLibraryMappings.xml
+.idea/go_game.iml
+.idea/misc.xml
 
 # Sensitive or high-churn files:
 .idea/dataSources.ids
