@@ -1,6 +1,6 @@
 import tkinter as tk
 from PIL import ImageTk, Image
-# from go import Game
+from go import Game, TypesOfGames
 
 # Root settings
 WIDTH = 1080
@@ -10,10 +10,12 @@ LABEL_COLOR = '#B88B5E'
 BUTTON_COLOR = '#D09E6B'
 BUTTON_PRESSED_COLOR = '#B88B5E'
 
-game_settings = {
-    'player_count': 1,
-    'field_size': 9,
-}
+
+class GameSettings:
+    def __init__(self):
+        self.size = 9
+        self.player_count = 1
+
 
 is_white_turn = True  # TODO: Заглушка, убрать
 window = tk.Tk()
@@ -26,9 +28,11 @@ black_ceil = tk.PhotoImage(file='./black.png')
 main_menu_bg_image = Image.open('./main_menu_bg.jpg')
 main_menu_bg = ImageTk.PhotoImage(main_menu_bg_image)
 
+
 class Display:
     def __init__(self, window):
         self.game_field_ceil = None
+        self.game_settings = GameSettings()
 
         window.geometry(f'{WIDTH}x{HEIGHT}')
         window.title('Игра "Го"')
@@ -52,9 +56,9 @@ class Display:
 
         choose_player_count = self.create_label('Выберете режим игры', game_players_count_frame, width=20)
         singleplayer_button = self.create_button('С компьютером', game_players_count_frame,
-                                                 callback=lambda: self.save_chosen_player_count(1, game_settings))
+                                                 callback=lambda: self.save_chosen_player_count(1))
         multiplayer_button = self.create_button('Два игрока', game_players_count_frame,
-                                                callback=lambda: self.save_chosen_player_count(2, game_settings))
+                                                callback=lambda: self.save_chosen_player_count(2))
 
         # Game size
         game_size_frame = self.create_menu_frame()
@@ -62,11 +66,11 @@ class Display:
 
         choose_field_size = self.create_label('Выберете размер игрового поля', game_size_frame, width=20)
         field_size_9x9 = self.create_button('9x9', game_size_frame, width=10,
-                                            callback=lambda: self.save_chosen_field_size(9, game_settings))
+                                            callback=lambda: self.save_chosen_field_size(9))
         field_size_13x13 = self.create_button('13x13', game_size_frame, width=10,
-                                              callback=lambda: self.save_chosen_field_size(13, game_settings))
+                                              callback=lambda: self.save_chosen_field_size(13))
         field_size_19x19 = self.create_button('19x19', game_size_frame, width=10,
-                                              callback=lambda: self.save_chosen_field_size(19, game_settings))
+                                              callback=lambda: self.save_chosen_field_size(19))
         field_size_custom = self.create_button('Другой', game_size_frame, width=10,
                                                callback=None)
 
@@ -115,8 +119,8 @@ class Display:
         menu_frame.pack_propagate(False)
         return menu_frame
 
-    def save_chosen_player_count(self, count, game_settings_data):
-        game_settings_data['player_count'] = count
+    def save_chosen_player_count(self, count):
+        self.game_settings.player_count = count
         self.change_frame(self.game_players_count_frame, self.game_size_frame)
 
     @staticmethod
@@ -127,14 +131,15 @@ class Display:
                         bd=0,
                         )
 
-    def save_chosen_field_size(self, size, game_settings_data):
-        game_settings_data['field_size'] = size
-        # TODO: Отправить запрос на начало игры
+    def save_chosen_field_size(self, size):
+        self.game_settings.size = size
+        self.game = Game()
+        self.game.start_new_game(self.game_settings.size, TypesOfGames.multiplayer)
         self.game_field_ceil = self.init_game_field()
         self.change_frame(self.game_size_frame, self.game_frame)
 
     def init_game_field(self):
-        field_size = game_settings['field_size']
+        field_size = self.game_settings.size
         self.state.grid(row=0, columnspan=field_size)
         game_field_ceil = []
         for x in range(1, field_size + 1):
