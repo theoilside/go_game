@@ -3,14 +3,6 @@ from enum import Enum
 import random
 
 
-def generate_starting_board_2d(size):
-    board = ['x' * (size + 2)]
-    for i in range(size):
-        board.append('x' + ('.' * size) + 'x')
-    board.append('x' * (size + 2))
-    return board
-
-
 class Colors(Enum):
     white = 'white'
     black = 'black'
@@ -54,7 +46,7 @@ class SingleplayerGame(Game):
 
     def make_ai_move(self):
         x, y = self.AI.get_move()
-        self.place_piece(self.color_of_AI, x, y)
+        self.place_piece(x, y)
         return x, y
 
 
@@ -83,12 +75,31 @@ class Board:
 
     def __init__(self, size):
         self.size = size
-        self.board = generate_starting_board_2d(size)
         self.size_with_borders = size + 2
+        board = [[TypesOfCells.border] * self.size_with_borders]
+        for i in range(self.size):
+            data_of_row = ([TypesOfCells.border] + [TypesOfCells.empty] * self.size + [TypesOfCells.border])
+            board.append(data_of_row)
+        board.append([TypesOfCells.border] * self.size_with_borders)
+        self.board = board
 
-    def print(self):
+    def __str__(self):
+        array = []
+
         for row in self.board:
-            print(row)
+            for element in row:
+                array.append(str(element))
+            array.append('\n')
+        return ''.join(array)
+
+
+    def generate_starting_board(self):
+        board = [[TypesOfCells.border] * self.size_with_borders]
+        for i in range(self.size):
+            data_of_row = ([TypesOfCells.border] + [TypesOfCells.empty] * self.size + [TypesOfCells.border])
+            board.append(data_of_row)
+        board.append([TypesOfCells.border] * self.size_with_borders)
+        return board
 
     def calculate_id(self, x, y):
         return y * self.size_with_borders + x
@@ -142,6 +153,12 @@ class TypesOfCells(Enum):
     empty = '.'
     border = 'x'
 
+    def __str__(self):
+        return self.value
+
+    def __repr__(self):
+        return self.value
+
 
 class Cell:
     def __init__(self, type: TypesOfCells):
@@ -158,8 +175,10 @@ elif inputted_color == 'b':
 else:
     raise 'Неправильный цвет!'
 game.start_new_game(9, color_of_human)
+print(game.board)
 while True:
     game.board.print()
     print('Напиши свой ход в формате «x,y», где «x» и «y» — координаты')
     inputted_coords = input().split(',')
-    game.place_piece(game.color_of_current_move)
+    game.place_piece(int(inputted_coords[0]), int(inputted_coords[1]))
+    game.make_ai_move()
