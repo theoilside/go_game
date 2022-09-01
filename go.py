@@ -1,5 +1,6 @@
 import math
 from enum import Enum
+import random
 
 
 def generate_starting_board_2d(size):
@@ -9,9 +10,15 @@ def generate_starting_board_2d(size):
     board.append('x' * (size + 2))
     return board
 
+
 class Colors(Enum):
     white = 'white'
     black = 'black'
+
+    def get_opposite(self):
+        if self.value == 'white':
+            return 'black'
+        return 'white'
 
 
 class TypesOfGames(Enum):
@@ -22,21 +29,51 @@ class TypesOfGames(Enum):
 class Game:
     def __init__(self):
         self.board = None
-        self.type_of_game = None
-        self.color_of_player = None
+        self.color_of_current_move = Colors.black
 
-    def start_new_game(self, size, type_of_game: TypesOfGames, color_of_player: Colors = 'black'):
+    def start_new_game(self, size):
         self.board = Board(size)
-        self.type_of_game = type_of_game
-        self.color_of_player = color_of_player
 
     def place_piece(self, color: Colors, x, y):
         self.board.place_piece(color, x, y)
-
-    def request_ai_move(self):
-        ...
+        self.color_of_current_move = self.color_of_current_move.get_opposite()
 
 
+class SingleplayerGame(Game):
+    def __init__(self):
+        super().__init__()
+        self.color_of_human = None
+        self.color_of_AI = None
+        self.AI = None
+
+    def start_new_game(self, size, color_of_human: Colors = 'black'):
+        super().start_new_game(size)
+        self.color_of_human = color_of_human
+        self.color_of_AI = color_of_human.get_opposite()
+        self.AI = AI(self.board)
+
+    def make_ai_move(self):
+        x, y = self.AI.get_move()
+        self.place_piece(self.color_of_AI, x, y)
+        return x, y
+
+
+class MultiplayerGame(Game):
+    def __init__(self):
+        super().__init__()
+
+    def start_new_game(self, size):
+        super().start_new_game(size)
+
+
+class AI:
+    def __init__(self, board):
+        self.board = board
+
+    def get_move(self, current_color: Colors = 'white'):
+        x = random.randint(0, self.board.size - 1)
+        y = random.randint(0, self.board.size - 1)
+        return x, y
 
 
 class Board:
@@ -56,16 +93,18 @@ class Board:
     def calculate_id(self, x, y):
         return y * self.size_with_borders + x
 
-    def place_piece(self, color, x, y):
-        if color not in ('black', 'white'):
-            raise ('Цветом может быть только “black” или “white”! Введенное значение color: {0}'.format(color))
+    def place_piece(self, color: Colors, x, y):
         if not (self.size > x >= 0 and self.size > y >= 0):
-            raise ('id слишком большой/маленький! Введенное значение id: {0}'.format(id))
-        self.board[y+1][x+1] = Cell(color)
+            raise ('id слишком большой/маленький! Введенное значение id: {0}. Доступный диапазон: от 0 до {1}'
+                   .format(id, self.size))
+        if color == Colors.black:
+            self.board[y + 1][x + 1] = Cell(TypesOfCells.black)
+        else:
+            self.board[y + 1][x + 1] = Cell(TypesOfCells.white)
 
     def get_piece_by_id(self, id):
         if id < 0 or id >= (self.size + 2) * (self.size + 2):
-            raise('id слишком большой/маленький! Введенное значение id: {0}'.format(id))
+            raise ('id слишком большой/маленький! Введенное значение id: {0}'.format(id))
         return self.board[math.floor(id / (self.size + 2))][id % (self.size + 2)]
 
     def calculate_liberties(self, location_id, color):
@@ -97,20 +136,22 @@ class Board:
         #     liberties.append(square)
 
 
-class Cell:
-    types = {
-        'black': 'b',
-        'white': 'w',
-        'empty': '.',
-        'void': 'x'
-    }
+class TypesOfCells(Enum):
+    black = 'b'
+    white = 'w'
+    empty = '.'
+    border = 'x'
 
-    def __init__(self, type):
-        if type not in self.types:
-            raise ('Неверно указан тип объекта! Возможные значения: {0}'.format(self.types.keys))
+
+class Cell:
+    def __init__(self, type: TypesOfCells):
         self.type = type
 
 
-
-new_game = Board(9)
-new_game.print()
+game = SingleplayerGame()
+print('Напиши, каким цветом хочешь играть — «b» или «w». Первыми ходят черные')
+color_of_human = input()
+game.start_new_game(9)
+while True:
+    game.board.print()
+    print('Напиши свой ход в формате «x,y», где «x» и «y» — координаты')
