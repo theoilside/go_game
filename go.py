@@ -26,7 +26,7 @@ class Game:
 
     def start_new_game(self, size):
         self.board = Board(size)
-        return ReqestResponse.StartGameResponse(True, Colors.black)
+        return StartGameResponse(True, Colors.black)
 
     def place_piece(self, x, y):
         self.board.place_piece(x, y)
@@ -53,7 +53,7 @@ class SingleplayerGame(Game):
     def make_ai_move(self):
         x, y = self.AI.get_move()
         self.place_piece(x, y)
-        return ReqestResponse.MakeMoveByAIResponse(x, y, self.color_of_current_move)
+        return MakeMoveByAIResponse(x, y, self.color_of_current_move)
 
 
 class MultiplayerGame(Game):
