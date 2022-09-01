@@ -1,4 +1,6 @@
 import math
+from enum import Enum
+
 
 def generate_starting_board_2d(size):
     board = ['x' * (size + 2)]
@@ -6,6 +8,35 @@ def generate_starting_board_2d(size):
         board.append('x' + ('.' * size) + 'x')
     board.append('x' * (size + 2))
     return board
+
+class Colors(Enum):
+    white = 'white'
+    black = 'black'
+
+
+class TypesOfGames(Enum):
+    singleplayer = 'singleplayer'
+    multiplayer = 'multiplayer'
+
+
+class Game:
+    def __init__(self):
+        self.board = None
+        self.type_of_game = None
+        self.color_of_player = None
+
+    def start_new_game(self, size, type_of_game: TypesOfGames, color_of_player: Colors = 'black'):
+        self.board = Board(size)
+        self.type_of_game = type_of_game
+        self.color_of_player = color_of_player
+
+    def place_piece(self, color: Colors, x, y):
+        self.board.place_piece(color, x, y)
+
+    def request_ai_move(self):
+        ...
+
+
 
 
 class Board:
@@ -16,16 +47,26 @@ class Board:
     def __init__(self, size):
         self.size = size
         self.board = generate_starting_board_2d(size)
+        self.size_with_borders = size + 2
 
     def print(self):
         for row in self.board:
             print(row)
 
+    def calculate_id(self, x, y):
+        return y * self.size_with_borders + x
+
+    def place_piece(self, color, x, y):
+        if color not in ('black', 'white'):
+            raise ('Цветом может быть только “black” или “white”! Введенное значение color: {0}'.format(color))
+        if not (self.size > x >= 0 and self.size > y >= 0):
+            raise ('id слишком большой/маленький! Введенное значение id: {0}'.format(id))
+        self.board[y+1][x+1] = Cell(color)
+
     def get_piece_by_id(self, id):
         if id < 0 or id >= (self.size + 2) * (self.size + 2):
             raise('id слишком большой/маленький! Введенное значение id: {0}'.format(id))
-        else:
-            return self.board[math.floor(id / (self.size + 2))][id % (self.size + 2)]
+        return self.board[math.floor(id / (self.size + 2))][id % (self.size + 2)]
 
     def calculate_liberties(self, location_id, color):
         if color not in ('w', 'b'):
@@ -56,7 +97,7 @@ class Board:
         #     liberties.append(square)
 
 
-class Object:
+class Cell:
     types = {
         'black': 'b',
         'white': 'w',
@@ -68,6 +109,7 @@ class Object:
         if type not in self.types:
             raise ('Неверно указан тип объекта! Возможные значения: {0}'.format(self.types.keys))
         self.type = type
+
 
 
 new_game = Board(9)
