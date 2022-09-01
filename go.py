@@ -14,7 +14,7 @@ class Game:
         return ReqestResponse.StartGameResponse(True, Colors.black)
 
     def place_piece(self, x, y):
-        self.board.place_piece(x, y)
+        self.board.place_piece(self.color_of_current_move, x, y)
         self.color_of_current_move = self.color_of_current_move.get_opposite()
 
     def make_player_move(self, x, y):
@@ -32,8 +32,9 @@ class SingleplayerGame(Game):
     def start_new_game(self, size, color_of_human: Colors = 'black'):
         self.color_of_human = color_of_human
         self.color_of_AI = color_of_human.get_opposite()
+        response = super().start_new_game(size)
         self.AI = AI(self.board)
-        return super().start_new_game(size)
+        return response
 
     def make_ai_move(self):
         x, y = self.AI.get_move()
@@ -53,7 +54,7 @@ class AI:
     def __init__(self, board):
         self.board = board
 
-    def get_move(self, current_color: Colors = 'white'):
+    def get_move(self):
         x = random.randint(0, self.board.size - 1)
         y = random.randint(0, self.board.size - 1)
         return x, y
