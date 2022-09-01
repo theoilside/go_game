@@ -34,8 +34,8 @@ class Game:
     def start_new_game(self, size):
         self.board = Board(size)
 
-    def place_piece(self, color: Colors, x, y):
-        self.board.place_piece(color, x, y)
+    def place_piece(self, x, y):
+        self.board.place_piece(self.color_of_current_move, x, y)
         self.color_of_current_move = self.color_of_current_move.get_opposite()
 
 
@@ -150,8 +150,16 @@ class Cell:
 
 game = SingleplayerGame()
 print('Напиши, каким цветом хочешь играть — «b» или «w». Первыми ходят черные')
-color_of_human = input()
-game.start_new_game(9)
+inputted_color = input()
+if inputted_color == 'w':
+    color_of_human = Colors.white
+elif inputted_color == 'b':
+    color_of_human = Colors.black
+else:
+    raise 'Неправильный цвет!'
+game.start_new_game(9, color_of_human)
 while True:
     game.board.print()
     print('Напиши свой ход в формате «x,y», где «x» и «y» — координаты')
+    inputted_coords = input().split(',')
+    game.place_piece(game.color_of_current_move)
