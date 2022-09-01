@@ -11,8 +11,8 @@ class Colors(Enum):
 
     def get_opposite(self):
         if self.value == 'white':
-            return 'black'
-        return 'white'
+            return Colors.black
+        return Colors.white
 
 
 class TypesOfGames(Enum):
@@ -30,11 +30,12 @@ class Game:
         return ReqestResponse.StartGameResponse(True, Colors.black)
 
     def place_piece(self, x, y):
-        self.board.place_piece(x, y)
+        self.board.place_piece(self.color_of_current_move, x, y)
         self.color_of_current_move = self.color_of_current_move.get_opposite()
 
     def make_player_move(self, x, y):
         self.place_piece(x, y)
+        print(self.board)
         return ReqestResponse.MakeMoveByPlayerResponse(True, self.color_of_current_move)
 
 
@@ -45,7 +46,7 @@ class SingleplayerGame(Game):
         self.color_of_AI = None
         self.AI = None
 
-    def start_new_game(self, size, color_of_human: Colors = 'black'):
+    def start_new_game(self, size, color_of_human: Colors = Colors.black):
         self.color_of_human = color_of_human
         self.color_of_AI = color_of_human.get_opposite()
         self.AI = AI(self.board)
@@ -171,21 +172,24 @@ class Cell:
     def __init__(self, type: TypesOfCells):
         self.type = type
 
+    def __str__(self):
+        return str(self.type)
 
-game = SingleplayerGame()
-print('Напиши, каким цветом хочешь играть — «b» или «w». Первыми ходят черные')
-inputted_color = input()
-if inputted_color == 'w':
-    color_of_human = Colors.white
-elif inputted_color == 'b':
-    color_of_human = Colors.black
-else:
-    raise 'Неправильный цвет!'
-game.start_new_game(9, color_of_human)
-print(game.board)
-while True:
-    game.board.print()
-    print('Напиши свой ход в формате «x,y», где «x» и «y» — координаты')
-    inputted_coords = input().split(',')
-    game.place_piece(int(inputted_coords[0]), int(inputted_coords[1]))
-    game.make_ai_move()
+if __name__ == '__main__':
+    game = SingleplayerGame()
+    print('Напиши, каким цветом хочешь играть — «b» или «w». Первыми ходят черные')
+    inputted_color = input()
+    if inputted_color == 'w':
+        color_of_human = Colors.white
+    elif inputted_color == 'b':
+        color_of_human = Colors.black
+    else:
+        raise 'Неправильный цвет!'
+    game.start_new_game(9, color_of_human)
+    print(game.board)
+    while True:
+        game.board.print()
+        print('Напиши свой ход в формате «x,y», где «x» и «y» — координаты')
+        inputted_coords = input().split(',')
+        game.place_piece(int(inputted_coords[0]), int(inputted_coords[1]))
+        game.make_ai_move()
