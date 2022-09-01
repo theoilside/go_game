@@ -1,8 +1,7 @@
 import math
 from enum import Enum
 import random
-
-import ReqestResponse
+from ReqestResponse import *
 
 
 class Colors(Enum):
@@ -27,7 +26,7 @@ class Game:
 
     def start_new_game(self, size):
         self.board = Board(size)
-        return ReqestResponse.StartGameResponse(True, Colors.black)
+        return StartGameResponse(True, Colors.black)
 
     def place_piece(self, x, y):
         self.board.place_piece(x, y)
@@ -35,7 +34,7 @@ class Game:
 
     def make_player_move(self, x, y):
         self.place_piece(x, y)
-        return ReqestResponse.MakeMoveByPlayerResponse(True, self.color_of_current_move)
+        return MakeMoveByPlayerResponse(True, self.color_of_current_move)
 
 
 class SingleplayerGame(Game):
@@ -54,7 +53,7 @@ class SingleplayerGame(Game):
     def make_ai_move(self):
         x, y = self.AI.get_move()
         self.place_piece(x, y)
-        return ReqestResponse.MakeMoveByAIResponse(x, y, self.color_of_current_move)
+        return MakeMoveByAIResponse(x, y, self.color_of_current_move)
 
 
 class MultiplayerGame(Game):
@@ -92,13 +91,11 @@ class Board:
 
     def __str__(self):
         array = []
-
         for row in self.board:
             for element in row:
                 array.append(str(element))
             array.append('\n')
         return ''.join(array)
-
 
     def generate_starting_board(self):
         board = [[TypesOfCells.border] * self.size_with_borders]
@@ -181,10 +178,14 @@ elif inputted_color == 'b':
     color_of_human = Colors.black
 else:
     raise 'Неправильный цвет!'
-game.start_new_game(9, color_of_human)
-print(game.board)
+print('Напиши размер поля')
+inputted_size = input()
+if int(inputted_size) < 2:
+    raise 'Неправильный размер!'
+game.start_new_game(int(inputted_size), color_of_human)
+print('1')
 while True:
-    game.board.print()
+    print(game.board)
     print('Напиши свой ход в формате «x,y», где «x» и «y» — координаты')
     inputted_coords = input().split(',')
     game.place_piece(int(inputted_coords[0]), int(inputted_coords[1]))
