@@ -1,11 +1,9 @@
 import tkinter as tk
 from PIL import ImageTk, Image
 
-from Game import SingleplayerGame, MultiplayerGame
 from GameSettings import GameSettings
 from ReqestResponse import StartGameResponse, MakeMoveByPlayerResponse, MakeMoveByAIResponse
 from go import TypesOfGames, Colors
-
 
 # Root settings
 WIDTH = 1080
@@ -75,7 +73,7 @@ class Display:
                                                callback=None)
 
         self.game_frame = tk.Frame(self.window)
-        self.state = tk.Label(self.game_frame, text='Сейчас ходит белый игрок', font='Calibri 20')
+        self.game_settings.info_label = tk.Label(self.game_frame, font='Calibri 20')
 
     def create_label(self, text, parent, font='Calibri 34', width=15):
         border = self._create_border(parent)
@@ -133,25 +131,24 @@ class Display:
 
     def save_chosen_field_size(self, size):
         self.game_settings.size = size
-        self.game = SingleplayerGame() if self.game_settings.game_type == TypesOfGames.singleplayer else MultiplayerGame()
 
-        start_game_response: StartGameResponse = self.game.start_new_game(self.game_settings.size)
+        start_game_response: StartGameResponse = self.game_settings.game_state.start_new_game(self.game_settings.size)
         if not start_game_response.is_success:
             # TODO: Переписать на окно с выводом ошибки
             raise 'Невозомжно начать игру'
         self.game_settings.current_turn_color = start_game_response.current_turn
         if self.game_settings.game_type == TypesOfGames.multiplayer:
-            self.state.configure(
-                text=f'Сейчас ходит {"белый" if self.game_settings.current_turn_color == Colors.white else "чёрный"} игрок')
+            self.game_settings.configure_label_multiplayer()
         else:
-            self.state.configure(text='Вы играете за чёрных')
+            self.game_settings.configure_label_singleplayer(Colors.black)
 
         self.game_field_ceil = self.init_game_field()
         self.change_frame(self.game_size_frame, self.game_frame)
 
     def init_game_field(self):
         field_size = self.game_settings.size
-        self.state.grid(row=0, columnspan=field_size)
+        self.game_settings.info_label.grid(row=0, columnspan=field_size)
+
         game_field_ceil = []
         for x in range(1, field_size + 1):
             game_row_ceil = []
@@ -161,18 +158,23 @@ class Display:
                                image=empty_ceil,
                                borderwidth=0,
                                highlightthickness=0,
-                               relief=tk.RAISED,
                                )
                 btn.bind("<Button-1>", lambda e, x=x - 1, y=y: self.on_game_cell_pressed(x, y))
 
                 btn.grid(row=x, column=y)
                 game_row_ceil.append(btn)
             game_field_ceil.append(game_row_ceil)
+
+        pass_button = tk.Button(self.game_frame, text='ПАСС', font='Calibri 34 bold', bg=BUTTON_COLOR,
+                                activebackground=BUTTON_PRESSED_COLOR, )
+        pass_button.grid(row=field_size + 3, columnspan=field_size, pady=(20, 0))
         return game_field_ceil
 
     def on_game_cell_pressed(self, row, column):
-        make_move_player_response: MakeMoveByPlayerResponse = self.game.make_player_move(x=column, y=row)
+        make_move_player_response: MakeMoveByPlayerResponse = \
+            self.game_settings.game_state.make_player_move(x=column, y=row)
         if not make_move_player_response.is_success:
+            # TODO: Поменять на выведение ошибки
             raise 'Нельзя сделать такой ход'
 
         # Пока отображаем как для игры двух человек
@@ -181,12 +183,10 @@ class Display:
 
         self.game_settings.current_turn_color = make_move_player_response.current_turn
 
-        if self.game_settings.game_type == TypesOfGames.multiplayer:
-            self.state.configure(
-                text=f'Сейчас ходит {"белый" if self.game_settings.current_turn_color == Colors.white else "чёрный"} игрок')
+        self.game_settings.configure_label()
 
         if self.game_settings.game_type == TypesOfGames.singleplayer:
-            make_move_by_ai_response: MakeMoveByAIResponse = self.game.make_ai_move()
+            make_move_by_ai_response: MakeMoveByAIResponse = self.game_settings.game_state.make_ai_move()
             self.game_field_ceil[make_move_by_ai_response.y][make_move_by_ai_response.x].configure(
                 image=white_ceil if self.game_settings.current_turn_color == Colors.white else black_ceil)
 
