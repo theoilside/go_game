@@ -10,10 +10,10 @@ class StartGameResponse:
 
 
 class MakeMoveByPlayerResponse:
-    def __init__(self, is_success: bool, current_turn: Colors):
+    def __init__(self, is_success: bool, current_turn: Colors, error_message=None):
         self.is_success: bool = is_success
         self.current_turn: Colors = current_turn
-        self.error_message: Optional[str] = None
+        self.error_message: Optional[str] = error_message
 
 
 class MakeMoveByAIResponse:

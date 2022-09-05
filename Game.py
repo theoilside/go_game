@@ -12,13 +12,16 @@ class Game:
         self.board = Board(size)
         return ReqestResponse.StartGameResponse(True, Colors.black)
 
-    def place_piece(self, x, y):
-        self.board.place_piece(self.color_of_current_move, x, y)
-        self.color_of_current_move = self.color_of_current_move.get_opposite()
-
     def make_player_move(self, x, y):
-        self.place_piece(x, y)
-        return ReqestResponse.MakeMoveByPlayerResponse(True, self.color_of_current_move)
+        if self.place_piece(x, y):
+            return ReqestResponse.MakeMoveByPlayerResponse(True, self.color_of_current_move)
+        return ReqestResponse.MakeMoveByPlayerResponse(False, self.color_of_current_move, 'Cannot make move!')
+
+    def place_piece(self, x, y):
+        if self.board.place_piece(self.color_of_current_move, x, y):
+            self.color_of_current_move = self.color_of_current_move.get_opposite()
+            return True
+        return False
 
 
 class SingleplayerGame(Game):
@@ -36,8 +39,10 @@ class SingleplayerGame(Game):
         return response
 
     def make_ai_move(self):
-        x, y = self.AI.get_move()
-        self.place_piece(x, y)
+        while True:
+            x, y = self.AI.get_move()
+            if self.place_piece(x, y):
+                break
         return ReqestResponse.MakeMoveByAIResponse(x, y, self.color_of_current_move)
 
 
