@@ -1,8 +1,11 @@
 import tkinter as tk
 from PIL import ImageTk, Image
 
+from Game import SingleplayerGame, MultiplayerGame
+from GameSettings import GameSettings
 from ReqestResponse import StartGameResponse, MakeMoveByPlayerResponse, MakeMoveByAIResponse
-from go import MultiplayerGame, SingleplayerGame, TypesOfGames, Colors
+from go import TypesOfGames, Colors
+
 
 # Root settings
 WIDTH = 1080
@@ -11,16 +14,9 @@ HEIGHT = 720
 LABEL_COLOR = '#B88B5E'
 BUTTON_COLOR = '#D09E6B'
 BUTTON_PRESSED_COLOR = '#B88B5E'
+BLACK_COLOR = '#000000'
 
-
-class GameSettings:
-    def __init__(self):
-        self.size: int = 9
-        self.game_type: TypesOfGames = TypesOfGames.singleplayer
-        self.current_turn_color: Colors = Colors.black
-
-
-window = tk.Tk()
+main_window = tk.Tk()
 
 # Bg images
 empty_ceil = tk.PhotoImage(file='./empty.png')
@@ -111,6 +107,14 @@ class Display:
         return button
 
     @staticmethod
+    def _create_border(parent):
+        return tk.Frame(parent,
+                        highlightbackground=BLACK_COLOR,
+                        highlightthickness=2,
+                        bd=0,
+                        )
+
+    @staticmethod
     def change_frame(old_frame, new_frame):
         old_frame.pack_forget()
         new_frame.pack()
@@ -127,20 +131,13 @@ class Display:
         self.game_settings.game_type = game_type
         self.change_frame(self.game_players_count_frame, self.game_size_frame)
 
-    @staticmethod
-    def _create_border(parent):
-        return tk.Frame(parent,
-                        highlightbackground='black',
-                        highlightthickness=2,
-                        bd=0,
-                        )
-
     def save_chosen_field_size(self, size):
         self.game_settings.size = size
         self.game = SingleplayerGame() if self.game_settings.game_type == TypesOfGames.singleplayer else MultiplayerGame()
 
         start_game_response: StartGameResponse = self.game.start_new_game(self.game_settings.size)
         if not start_game_response.is_success:
+            # TODO: Переписать на окно с выводом ошибки
             raise 'Невозомжно начать игру'
         self.game_settings.current_turn_color = start_game_response.current_turn
         if self.game_settings.game_type == TypesOfGames.multiplayer:
@@ -196,5 +193,5 @@ class Display:
             self.game_settings.current_turn_color = make_move_by_ai_response.current_turn
 
 
-display = Display(window)
+display = Display(main_window)
 display.window.mainloop()
