@@ -204,5 +204,6 @@ class Display:
             self.game_settings.current_turn_color = make_move_by_ai_response.current_turn
 
 
-display = Display(main_window)
-display.window.mainloop()
+def start_gui():
+    display = Display(main_window)
+    display.window.mainloop()
