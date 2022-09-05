@@ -1,6 +1,5 @@
 import math
 import random
-
 import Game
 from enums import *
 
@@ -52,8 +51,8 @@ class Board:
 
     def place_piece(self, color: Colors, x, y):
         if not (self.size >= x >= 1 and self.size >= y >= 1):
-            raise ('id слишком большой/маленький! Введенное значение id: {0}. Доступный диапазон: от 0 до {1}'
-                   .format(id, self.size))
+            raise IndexError('id слишком большой/маленький! Введенное значение id: {0}. Доступный диапазон: от 0 до {1}'
+                             .format(id, self.size))
         if self.board[y][x] == TypesOfCells.empty:
             if color == Colors.black:
                 self.board[y][x] = Cell(TypesOfCells.black)
@@ -64,12 +63,12 @@ class Board:
 
     def get_piece_by_id(self, id):
         if id < 0 or id >= (self.size + 2) * (self.size + 2):
-            raise ('id слишком большой/маленький! Введенное значение id: {0}'.format(id))
+            raise IndexError('id слишком большой/маленький! Введенное значение id: {0}'.format(id))
         return self.board[math.floor(id / (self.size + 2))][id % (self.size + 2)]
 
     def calculate_liberties(self, location_id, color):
         if color not in ('w', 'b'):
-            raise ('Цветом может быть только “w” или “b”! Введенное значение color: {0}'.format(color))
+            raise IndexError('Цветом может быть только “w” или “b”! Введенное значение color: {0}'.format(color))
         piece = self.get_piece_by_id(location_id)
         if piece == 'x':
             return
@@ -113,11 +112,11 @@ if __name__ == '__main__':
     elif inputted_color == 'b':
         color_of_human = Colors.black
     else:
-        raise 'Неправильный цвет!'
+        raise IndexError('Неправильный цвет!')
     print('Напиши размер поля')
     inputted_size = input()
     if int(inputted_size) < 2:
-        raise 'Неправильный размер!'
+        raise IndexError('Неправильный размер!')
     game.start_new_game(int(inputted_size), color_of_human)
     while True:
         print(game.board)
