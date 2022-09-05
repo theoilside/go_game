@@ -16,16 +16,6 @@ BUTTON_COLOR = '#D09E6B'
 BUTTON_PRESSED_COLOR = '#B88B5E'
 BLACK_COLOR = '#000000'
 
-main_window = tk.Tk()
-
-# Bg images
-empty_ceil = tk.PhotoImage(file='./empty.png')
-white_ceil = tk.PhotoImage(file='./white.png')
-black_ceil = tk.PhotoImage(file='./black.png')
-
-main_menu_bg_image = Image.open('./main_menu_bg.jpg')
-main_menu_bg = ImageTk.PhotoImage(main_menu_bg_image)
-
 
 class Display:
     def __init__(self, window):
@@ -40,6 +30,14 @@ class Display:
         self.create_frames()
 
     def create_frames(self):
+        # Bg images
+        self.empty_ceil = tk.PhotoImage(file='./empty.png')
+        self.white_ceil = tk.PhotoImage(file='./white.png')
+        self.black_ceil = tk.PhotoImage(file='./black.png')
+
+        main_menu_bg_image = Image.open('./main_menu_bg.jpg')
+        self.main_menu_bg = ImageTk.PhotoImage(main_menu_bg_image)
+
         menu_frame = self.create_menu_frame()
         menu_frame.pack()
 
@@ -71,8 +69,8 @@ class Display:
                                               callback=lambda: self.save_chosen_field_size(13))
         field_size_19x19 = self.create_button('19x19', game_size_frame, width=10,
                                               callback=lambda: self.save_chosen_field_size(19))
-        field_size_custom = self.create_button('Другой', game_size_frame, width=10,
-                                               callback=None)
+        # field_size_custom = self.create_button('Другой', game_size_frame, width=10,
+        #                                        callback=None)
 
         self.game_frame = tk.Frame(self.window)
         self.game_settings.info_label = tk.Label(self.game_frame, font='Calibri 20')
@@ -121,7 +119,7 @@ class Display:
 
     def create_menu_frame(self):
         menu_frame = tk.Frame(self.window, width=WIDTH, height=HEIGHT)
-        main_menu_bg_label = tk.Label(menu_frame, image=main_menu_bg)
+        main_menu_bg_label = tk.Label(menu_frame, image=self.main_menu_bg)
         main_menu_bg_label.place(x=0, y=0)
 
         menu_frame.pack_propagate(False)
@@ -156,7 +154,7 @@ class Display:
             for y in range(field_size):
                 btn = tk.Label(self.game_frame,
                                text=' ',
-                               image=empty_ceil,
+                               image=self.empty_ceil,
                                borderwidth=0,
                                highlightthickness=0,
                                )
@@ -171,15 +169,14 @@ class Display:
         pass_button.grid(row=field_size + 3, columnspan=field_size, pady=(20, 0))
         return game_field_ceil
 
-    @staticmethod
-    def change_ceil_image(cell_type: TypesOfCells, label_to_change: tk.Label):
+    def change_ceil_image(self, cell_type: TypesOfCells, label_to_change: tk.Label):
         match cell_type:
             case TypesOfCells.white:
-                image = white_ceil
+                image = self.white_ceil
             case TypesOfCells.black:
-                image = black_ceil
+                image = self.black_ceil
             case _:
-                image = empty_ceil
+                image = self.empty_ceil
 
         label_to_change.configure(image=image)
 
@@ -205,5 +202,6 @@ class Display:
 
 
 def start_gui():
+    main_window = tk.Tk()
     display = Display(main_window)
     display.window.mainloop()
