@@ -51,13 +51,16 @@ class Board:
         return y * self.size_with_borders + x
 
     def place_piece(self, color: Colors, x, y):
-        if not (self.size > x >= 0 and self.size > y >= 0):
+        if not (self.size >= x >= 1 and self.size >= y >= 1):
             raise ('id слишком большой/маленький! Введенное значение id: {0}. Доступный диапазон: от 0 до {1}'
                    .format(id, self.size))
-        if color == Colors.black:
-            self.board[y + 1][x + 1] = Cell(TypesOfCells.black)
-        else:
-            self.board[y + 1][x + 1] = Cell(TypesOfCells.white)
+        if self.board[y][x] == TypesOfCells.empty:
+            if color == Colors.black:
+                self.board[y][x] = Cell(TypesOfCells.black)
+            else:
+                self.board[y][x] = Cell(TypesOfCells.white)
+            return True
+        return False
 
     def get_piece_by_id(self, id):
         if id < 0 or id >= (self.size + 2) * (self.size + 2):
@@ -118,7 +121,10 @@ if __name__ == '__main__':
     game.start_new_game(int(inputted_size), color_of_human)
     while True:
         print(game.board)
-        print('Напиши свой ход в формате «x,y», где «x» и «y» — координаты')
-        inputted_coords = input().split(',')
-        game.place_piece(int(inputted_coords[0]), int(inputted_coords[1]))
+        while True:
+            print('Напиши свой ход в формате «x,y», где «x» и «y» — координаты')
+            inputted_coords = input().split(',')
+            if game.place_piece(int(inputted_coords[0]), int(inputted_coords[1])):
+                break
+            print('Туда ходить нельзя, выбери другое место')
         game.make_ai_move()
