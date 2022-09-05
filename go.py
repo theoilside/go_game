@@ -101,7 +101,7 @@ class Cell:
         return str(self.type)
 
 
-if __name__ == '__main__':
+def start_cli():
     game = Game.SingleplayerGame()
     print('Напиши, каким цветом хочешь играть — «b» или «w». Первыми ходят черные')
     inputted_color = input()
