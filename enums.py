@@ -10,6 +10,13 @@ class Colors(Enum):
             return Colors.black
         return Colors.white
 
+    def get_type_of_cells(self):
+        match self:
+            case Colors.black:
+                return TypesOfCells.black
+            case Colors.white:
+                return TypesOfCells.white
+
 
 class TypesOfGames(Enum):
     singleplayer = 'singleplayer'
@@ -27,4 +34,3 @@ class TypesOfCells(Enum):
 
     def __repr__(self):
         return self.value
-

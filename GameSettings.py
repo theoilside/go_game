@@ -30,6 +30,6 @@ class GameSettings:
     def configure_label_singleplayer(self, color_of_player: Colors):
         self.info_label.configure(text=f'Вы играете за {"белыx" if color_of_player == Colors.white else "чёрныx"}')
 
-    def configure_label(self):
+    def update_label(self):
         if self.game_state == TypesOfGames.multiplayer:
             self.configure_label_multiplayer()

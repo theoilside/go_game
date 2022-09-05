@@ -1,3 +1,5 @@
+from typing import Optional
+
 from enums import *
 
 
@@ -11,6 +13,7 @@ class MakeMoveByPlayerResponse:
     def __init__(self, is_success: bool, current_turn: Colors):
         self.is_success: bool = is_success
         self.current_turn: Colors = current_turn
+        self.error_message: Optional[str] = None
 
 
 class MakeMoveByAIResponse:

@@ -1,8 +1,10 @@
 import tkinter as tk
 from PIL import ImageTk, Image
+from tkinter import messagebox
 
 from GameSettings import GameSettings
 from ReqestResponse import StartGameResponse, MakeMoveByPlayerResponse, MakeMoveByAIResponse
+from enums import TypesOfCells
 from go import TypesOfGames, Colors
 
 # Root settings
@@ -134,7 +136,6 @@ class Display:
 
         start_game_response: StartGameResponse = self.game_settings.game_state.start_new_game(self.game_settings.size)
         if not start_game_response.is_success:
-            # TODO: Переписать на окно с выводом ошибки
             raise 'Невозомжно начать игру'
         self.game_settings.current_turn_color = start_game_response.current_turn
         if self.game_settings.game_type == TypesOfGames.multiplayer:
@@ -170,25 +171,35 @@ class Display:
         pass_button.grid(row=field_size + 3, columnspan=field_size, pady=(20, 0))
         return game_field_ceil
 
+    @staticmethod
+    def change_ceil_image(cell_type: TypesOfCells, label_to_change: tk.Label):
+        match cell_type:
+            case TypesOfCells.white:
+                image = white_ceil
+            case TypesOfCells.black:
+                image = black_ceil
+            case _:
+                image = empty_ceil
+
+        label_to_change.configure(image=image)
+
     def on_game_cell_pressed(self, row, column):
         make_move_player_response: MakeMoveByPlayerResponse = \
             self.game_settings.game_state.make_player_move(x=column, y=row)
         if not make_move_player_response.is_success:
-            # TODO: Поменять на выведение ошибки
-            raise 'Нельзя сделать такой ход'
+            messagebox.showinfo('Нельзя сделать такой ход', make_move_player_response.error_message)
+            return
 
-        # Пока отображаем как для игры двух человек
-        self.game_field_ceil[row][column].configure(
-            image=white_ceil if self.game_settings.current_turn_color == Colors.white else black_ceil)
-
+        self.change_ceil_image(
+            self.game_settings.current_turn_color.get_type_of_cells(), self.game_field_ceil[row][column])
         self.game_settings.current_turn_color = make_move_player_response.current_turn
-
-        self.game_settings.configure_label()
+        self.game_settings.update_label()
 
         if self.game_settings.game_type == TypesOfGames.singleplayer:
             make_move_by_ai_response: MakeMoveByAIResponse = self.game_settings.game_state.make_ai_move()
-            self.game_field_ceil[make_move_by_ai_response.y][make_move_by_ai_response.x].configure(
-                image=white_ceil if self.game_settings.current_turn_color == Colors.white else black_ceil)
+
+            self.change_ceil_image(self.game_settings.current_turn_color.get_type_of_cells(),
+                                   self.game_field_ceil[make_move_by_ai_response.y][make_move_by_ai_response.x])
 
             self.game_settings.current_turn_color = make_move_by_ai_response.current_turn
 
