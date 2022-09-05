@@ -15,10 +15,6 @@ class AI:
 
 
 class Board:
-    # В этот список вносятся дамэ / дыхания (liberties)
-    list_of_liberties = []
-    list_of_block = []
-
     def __init__(self, size):
         self.size = size
         self.size_with_borders = size + 2
@@ -31,51 +27,45 @@ class Board:
 
     def __str__(self):
         array = []
-
         for row in self.board:
             for element in row:
                 array.append(str(element))
             array.append('\n')
         return ''.join(array)
 
-    def generate_starting_board(self):
-        board = [[TypesOfCells.border] * self.size_with_borders]
-        for i in range(self.size):
-            data_of_row = ([TypesOfCells.border] + [TypesOfCells.empty] * self.size + [TypesOfCells.border])
-            board.append(data_of_row)
-        board.append([TypesOfCells.border] * self.size_with_borders)
-        return board
-
     def calculate_id(self, x, y):
         return y * self.size_with_borders + x
 
     def place_piece(self, color: Colors, x, y):
-        if not (self.size >= x >= 1 and self.size >= y >= 1):
-            raise IndexError('id слишком большой/маленький! Введенное значение id: {0}. Доступный диапазон: от 0 до {1}'
-                             .format(id, self.size))
-        if self.board[y][x] == TypesOfCells.empty:
+        if not (self.size - 1 >= x >= 0 and self.size >= y >= 0):
+            raise IndexError(f'x или y слишком большой/маленький! Полученные значения: {x} и {y}. Доступный диапазон: '
+                             f'[0, {self.size - 1}].')
+        if self.board[y+1][x+1] == TypesOfCells.empty:
             if color == Colors.black:
-                self.board[y][x] = Cell(TypesOfCells.black)
+                self.board[y+1][x+1] = Cell(TypesOfCells.black)
             else:
-                self.board[y][x] = Cell(TypesOfCells.white)
+                self.board[y+1][x+1] = Cell(TypesOfCells.white)
             return True
         return False
 
     def get_piece_by_id(self, id):
         if id < 0 or id >= (self.size + 2) * (self.size + 2):
-            raise IndexError('id слишком большой/маленький! Введенное значение id: {0}'.format(id))
+            raise IndexError(f'id слишком большой/маленький! Полученное значение id: {id}.')
         return self.board[math.floor(id / (self.size + 2))][id % (self.size + 2)]
+
+    # В этот список вносятся дамэ / дыхания (liberties)
+    list_of_liberties = []
+    list_of_block = []
 
     def calculate_liberties(self, location_id, color):
         if color not in ('w', 'b'):
-            raise IndexError('Цветом может быть только “w” или “b”! Введенное значение color: {0}'.format(color))
+            raise IndexError(f'Цветом может быть только “w” или “b”! Полученное значение: {color}.')
         piece = self.get_piece_by_id(location_id)
         if piece == 'x':
             return
         if piece and piece == color:
             ...
-        #     # save stone's coordinate
-        #     block.append(square)
+        #    list_of_block.append(square)
         #
         #     # mark the stone
         #     board[square] |= MARKER
@@ -126,4 +116,5 @@ def start_cli():
             if game.place_piece(int(inputted_coords[0]), int(inputted_coords[1])):
                 break
             print('Туда ходить нельзя, выбери другое место')
+        print('Ходит компьютер...')
         game.make_ai_move()
