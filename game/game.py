@@ -1,7 +1,6 @@
-import ReqestResponse
-from enums import Colors
+import request_response
+from game.enums import Colors
 from go import Board, AI
-
 import logging
 
 

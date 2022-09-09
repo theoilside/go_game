@@ -1,11 +1,12 @@
 import logging
 import datetime
-from display import start_gui
-from go import start_cli
+from game.display import start_gui
+from game.go import start_cli
 
 if __name__ == '__main__':
-    # logging.basicConfig(filename=f'{datetime.datetime.now().strftime("%Y%m%d %H%M%S")}.log', level=logging.DEBUG)
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)-8s %(message)s',
+                        datefmt='%d %b %Y %H:%M:%S',
+                        filename=f'logs/{datetime.datetime.now().strftime("%Y%m%d %H%M%S")}.log', filemode='w')
 
     print('gui/cli (gui):', end='')
     interface = input()

@@ -1,7 +1,7 @@
 import math
 import random
-import Game
-from enums import *
+from game import game
+from game.enums import *
 
 
 class AI:

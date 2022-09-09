@@ -1,7 +1,7 @@
 from typing import Optional
 
-from enums import TypesOfGames, Colors
-from Game import SingleplayerGame, MultiplayerGame
+from game.enums import TypesOfGames, Colors
+from game.game import SingleplayerGame, MultiplayerGame
 
 import tkinter as tk
 

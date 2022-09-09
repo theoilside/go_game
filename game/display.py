@@ -1,9 +1,8 @@
 import tkinter as tk
 from PIL import ImageTk, Image
 from tkinter import messagebox
-
-from GameSettings import GameSettings
-from ReqestResponse import StartGameResponse, MakeMoveByPlayerResponse, MakeMoveByAIResponse
+from settings import GameSettings
+from request_response import StartGameResponse, MakeMoveByPlayerResponse, MakeMoveByAIResponse
 from enums import TypesOfCells
 from go import TypesOfGames, Colors
 
@@ -31,11 +30,11 @@ class Display:
 
     def create_frames(self):
         # Bg images
-        self.empty_ceil = tk.PhotoImage(file='./empty.png')
-        self.white_ceil = tk.PhotoImage(file='./white.png')
-        self.black_ceil = tk.PhotoImage(file='./black.png')
+        self.empty_ceil = tk.PhotoImage(file='../img/empty.png')
+        self.white_ceil = tk.PhotoImage(file='../img/white.png')
+        self.black_ceil = tk.PhotoImage(file='../img/black.png')
 
-        main_menu_bg_image = Image.open('./main_menu_bg.jpg')
+        main_menu_bg_image = Image.open('../img/main_menu_bg.jpg')
         self.main_menu_bg = ImageTk.PhotoImage(main_menu_bg_image)
 
         menu_frame = self.create_menu_frame()

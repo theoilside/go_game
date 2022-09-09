@@ -1,6 +1,6 @@
 from typing import Optional
 
-from enums import *
+from game.enums import *
 
 
 class StartGameResponse:
@@ -10,14 +10,16 @@ class StartGameResponse:
 
 
 class MakeMoveByPlayerResponse:
-    def __init__(self, is_success: bool, current_turn: Colors, error_message=None):
+    def __init__(self, is_success: bool, current_turn: Colors, error_message=None, captured_pieces=[]):
         self.is_success: bool = is_success
         self.current_turn: Colors = current_turn
         self.error_message: Optional[str] = error_message
+        self.captured_pieces = captured_pieces
 
 
 class MakeMoveByAIResponse:
-    def __init__(self, x: int, y: int, current_turn: Colors):
+    def __init__(self, x: int, y: int, current_turn: Colors, captured_pieces=None):
         self.x: int = x
         self.y: int = y
         self.current_turn: Colors = current_turn
+        self.captured_pieces = captured_pieces
