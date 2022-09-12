@@ -1,9 +1,14 @@
 import logging
 import datetime
+import os
+
 from game.display import start_gui
 from game.go import start_cli
 
+PATH_TO_SAVE_LOGS = './logs'
 if __name__ == '__main__':
+    if not os.path.exists(PATH_TO_SAVE_LOGS):
+        os.makedirs(PATH_TO_SAVE_LOGS)
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)-8s %(message)s',
                         datefmt='%d %b %Y %H:%M:%S',
                         filename=f'logs/{datetime.datetime.now().strftime("%Y%m%d %H%M%S")}.log', filemode='w')

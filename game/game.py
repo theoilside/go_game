@@ -1,6 +1,6 @@
-import request_response
-from game.enums import Colors
-from go import Board, AI
+from .request_response import *
+from .enums import Colors
+from .go import Board, AI
 import logging
 
 
@@ -11,16 +11,16 @@ class Game:
 
     def start_new_game(self, size):
         self.board = Board(size)
-        return ReqestResponse.StartGameResponse(True, Colors.black)
+        return StartGameResponse(True, Colors.black)
 
     def make_player_move(self, x, y):
         logging.debug(f"Запрос на постановку фигуры {self.color_of_current_move} игроком в позицию {x}-{y}")
         if self.place_piece(x, y):
             logging.debug(f"Фигура поставлена успешно")
-            return ReqestResponse.MakeMoveByPlayerResponse(True, self.color_of_current_move)
+            return MakeMoveByPlayerResponse(True, self.color_of_current_move)
 
         logging.debug(f"Фигура не была поставлена")
-        return ReqestResponse.MakeMoveByPlayerResponse(False, self.color_of_current_move, 'Cannot make move!')
+        return MakeMoveByPlayerResponse(False, self.color_of_current_move, 'Cannot make move!')
 
     def place_piece(self, x, y):
         logging.debug(f'Попытка поставить фишку цвета {self.color_of_current_move} в клетку {x}-{y}')
@@ -57,7 +57,7 @@ class SingleplayerGame(Game):
                 break
 
         logging.debug(f'Компьютер сходил в клетку {x}-{y}')
-        return ReqestResponse.MakeMoveByAIResponse(x, y, self.color_of_current_move)
+        return MakeMoveByAIResponse(x, y, self.color_of_current_move)
 
 
 class MultiplayerGame(Game):
