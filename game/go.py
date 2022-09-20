@@ -1,6 +1,6 @@
 import math
 import random
-from game import game
+from game.game import SingleplayerGame
 from game.enums import *
 
 
@@ -36,7 +36,7 @@ class Board:
     def calculate_id(self, x, y):
         return y * self.size_with_borders + x
 
-    def place_piece(self, color: Colors, x, y):
+    def place_piece(self, color: Colors, x: int, y: int):
         if not (self.size - 1 >= x >= 0 and self.size >= y >= 0):
             raise IndexError(f'x или y слишком большой/маленький! Полученные значения: {x} и {y}. Доступный диапазон: '
                              f'[0, {self.size - 1}].')
@@ -94,7 +94,7 @@ class Cell:
 
 
 def start_cli():
-    game = Game.SingleplayerGame()
+    game = SingleplayerGame()
     print('Напиши, каким цветом хочешь играть — «b» или «w». Первыми ходят черные')
     inputted_color = input()
     if inputted_color == 'w':
