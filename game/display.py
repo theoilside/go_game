@@ -1,75 +1,62 @@
 import tkinter as tk
-from PIL import ImageTk, Image
 from tkinter import messagebox
-from .settings import GameSettings
+
+from .display_repository.game_settings import GameSettings
+from .display_repository.image_storage import ImageStorage
 from .request_response import StartGameResponse, MakeMoveByPlayerResponse, MakeMoveByAIResponse
 from .enums import CellTypes
 from .go import TypesOfGames, Colors
-
-# Root settings
-WIDTH = 1080
-HEIGHT = 720
-
-LABEL_COLOR = '#B88B5E'
-BUTTON_COLOR = '#D09E6B'
-BUTTON_PRESSED_COLOR = '#B88B5E'
-BLACK_COLOR = '#000000'
+from .display_repository.consts import *
+from .display_repository.frame_storage import FrameStorage
 
 
 class Display:
     def __init__(self, window):
+        self.window = window
+
         self.game_field_ceil = None
         self.game_settings = GameSettings()
+        self.frame_storage = FrameStorage(window)
+        self.image_storage = ImageStorage()
 
         window.geometry(f'{WIDTH}x{HEIGHT}')
         window.title('Игра "Го"')
         window.iconbitmap('./img/icon.ico')
 
-        self.window = window
         self.create_frames()
 
     def create_frames(self):
-        # Bg images
-        self.empty_ceil = tk.PhotoImage(file='./img/empty.png')
-        self.white_ceil = tk.PhotoImage(file='./img/white.png')
-        self.black_ceil = tk.PhotoImage(file='./img/black.png')
-
-        main_menu_bg_image = Image.open('./img/main_menu_bg.jpg')
-        self.main_menu_bg = ImageTk.PhotoImage(main_menu_bg_image)
-
-        menu_frame = self.create_menu_frame()
+        menu_frame = self.frame_storage.create_menu_frame()
         menu_frame.pack()
 
-        game_name = self.create_label('Игра Го', menu_frame)
-        start_button = self.create_button('Начать игру', menu_frame,
-                                          callback=lambda: self.change_frame(menu_frame, game_players_count_frame))
-        settings_button = self.create_button('Настройки', menu_frame)
-        exit_button = self.create_button('Выход', menu_frame, callback=lambda: self.window.quit())
+        self.create_label('Игра Го', menu_frame)
+        self.create_button('Начать игру', menu_frame,
+                           callback=lambda: self.change_frame(menu_frame, game_players_count_frame))
+        self.create_button('Настройки', menu_frame)
+        self.create_button('Выход', menu_frame, callback=lambda: self.window.quit())
 
-        game_players_count_frame = self.create_menu_frame()
+        game_players_count_frame = self.frame_storage.create_menu_frame()
         self.game_players_count_frame = game_players_count_frame
 
-        choose_player_count = self.create_label('Выберете режим игры', game_players_count_frame, width=20)
-        singleplayer_button = self.create_button('С компьютером', game_players_count_frame,
-                                                 callback=lambda: self.save_chosen_player_count(
-                                                     TypesOfGames.singleplayer))
-        multiplayer_button = self.create_button('Два игрока', game_players_count_frame,
-                                                callback=lambda: self.save_chosen_player_count(
-                                                    TypesOfGames.multiplayer))
+        self.create_label('Выберете режим игры', game_players_count_frame, width=20)
+        self.create_button('С компьютером', game_players_count_frame,
+                           callback=lambda: self.save_chosen_player_count(
+                               TypesOfGames.singleplayer))
+        self.create_button('Два игрока', game_players_count_frame,
+                           callback=lambda: self.save_chosen_player_count(
+                               TypesOfGames.multiplayer))
 
         # Game size
-        game_size_frame = self.create_menu_frame()
+        game_size_frame = self.frame_storage.create_menu_frame()
         self.game_size_frame = game_size_frame
 
-        choose_field_size = self.create_label('Выберете размер игрового поля', game_size_frame, width=20)
-        field_size_9x9 = self.create_button('9x9', game_size_frame, width=10,
-                                            callback=lambda: self.save_chosen_field_size(9))
-        field_size_13x13 = self.create_button('13x13', game_size_frame, width=10,
-                                              callback=lambda: self.save_chosen_field_size(13))
-        field_size_19x19 = self.create_button('19x19', game_size_frame, width=10,
-                                              callback=lambda: self.save_chosen_field_size(19))
-        # field_size_custom = self.create_button('Другой', game_size_frame, width=10,
-        #                                        callback=None)
+        self.create_label('Выберете размер игрового поля', game_size_frame, width=20)
+        self.create_button('9x9', game_size_frame, width=10,
+                           callback=lambda: self.save_chosen_field_size(9))
+        self.create_button('13x13', game_size_frame, width=10,
+                           callback=lambda: self.save_chosen_field_size(13))
+        self.create_button('19x19', game_size_frame, width=10,
+                           callback=lambda: self.save_chosen_field_size(19))
 
         self.game_frame = tk.Frame(self.window)
         self.game_settings.info_label = tk.Label(self.game_frame, font='Calibri 20')
@@ -116,14 +103,6 @@ class Display:
         old_frame.pack_forget()
         new_frame.pack()
 
-    def create_menu_frame(self):
-        menu_frame = tk.Frame(self.window, width=WIDTH, height=HEIGHT)
-        main_menu_bg_label = tk.Label(menu_frame, image=self.main_menu_bg)
-        main_menu_bg_label.place(x=0, y=0)
-
-        menu_frame.pack_propagate(False)
-        return menu_frame
-
     def save_chosen_player_count(self, game_type: TypesOfGames):
         self.game_settings.game_type = game_type
         self.change_frame(self.game_players_count_frame, self.game_size_frame)
@@ -153,7 +132,7 @@ class Display:
             for y in range(field_size):
                 btn = tk.Label(self.game_frame,
                                text=' ',
-                               image=self.empty_ceil,
+                               image=self.image_storage.empty_cell,
                                borderwidth=0,
                                highlightthickness=0,
                                )
@@ -171,11 +150,11 @@ class Display:
     def change_ceil_image(self, cell_type: CellTypes, label_to_change: tk.Label):
         match cell_type:
             case CellTypes.white:
-                image = self.white_ceil
+                image = self.image_storage.white_cell
             case CellTypes.black:
-                image = self.black_ceil
+                image = self.image_storage.black_cell
             case _:
-                image = self.empty_ceil
+                image = self.image_storage.empty_cell
 
         label_to_change.configure(image=image)
 

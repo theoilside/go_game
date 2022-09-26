@@ -1,0 +1,11 @@
+WIDTH = 1080
+HEIGHT = 720
+
+LABEL_COLOR = '#B88B5E'
+BUTTON_COLOR = '#D09E6B'
+BUTTON_PRESSED_COLOR = '#B88B5E'
+BLACK_COLOR = '#000000'
+
+EMPTY_CELL_PATH = './img/empty.png'
+BLACK_CELL_PATH = './img/white.png'
+WHITE_CELL_PATH = './img/black.png'
