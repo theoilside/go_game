@@ -61,8 +61,8 @@ class Board:
 
     def get_cell(self, x, y):
         if not (self.size_with_borders > x >= 0 and self.size_with_borders > y >= 0):
-            raise IndexError(f'x или y слишком большой/маленький! Полученные значения: {x} и {y}. Доступный диапазон: '
-                             f'[0, {self.size_with_borders}).')
+            raise IndexError(f'Координаты слишком большие/маленькие! Полученные значения: {x - 1} и {y - 1}. '
+                             f'Доступный диапазон: [0, {self.size}).')
         return self.board[y][x]
 
     def update_cell(self, cell: Cell, new_type: CellTypes = None, new_state: CellStates = None):

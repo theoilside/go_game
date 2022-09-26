@@ -1,5 +1,6 @@
 from .game import SingleplayerGame, MultiplayerGame
 from .enums import Colors
+import re
 
 
 def start_cli():
@@ -45,9 +46,17 @@ def singleplayer_cli():
         print(game.board)
         while True:
             print('Напишите свой ход в формате «x,y», где «x» и «y» — координаты')
-            inputted_coords = input().split(',')
-            if game.make_player_move(int(inputted_coords[0]), int(inputted_coords[1])).is_success:
-                break
+            interface = input()
+            if not re.fullmatch(r'\d+,\d+', interface):
+                print('Некорректный ввод координат! Требуемый формат: x,y (например: 1,2).')
+                continue
+            inputted_coords = interface.split(',')
+            try:
+                if game.make_player_move(int(inputted_coords[0]), int(inputted_coords[1])).is_success:
+                    break
+            except IndexError as e:
+                print(e)
+                continue
             print('Туда ходить нельзя, выберите другое место!')
         print('Ходит компьютер...')
         game.make_ai_move()
@@ -70,10 +79,18 @@ def multiplayer_cli():
     game.start_new_game(int(board_size))
     while True:
         print(game.board)
+        print(f'Сейчас ходят {game.color_of_current_move}')
         while True:
-            print(f'Сейчас ходят {game.color_of_current_move}')
-            print('Напишите свой ход в формате «x,y», где «x» и «y» — координаты')
-            inputted_coords = input().split(',')
-            if game.make_player_move(int(inputted_coords[0]), int(inputted_coords[1])).is_success:
-                break
+            print('Напишите свой ход в формате x,y, где x и y — координаты')
+            interface = input()
+            if not re.fullmatch(r'\d+,\d+', interface):
+                print('Некорректный ввод координат! Требуемый формат: x,y (например: 1,2).')
+                continue
+            inputted_coords = interface.split(',')
+            try:
+                if game.make_player_move(int(inputted_coords[0]), int(inputted_coords[1])).is_success:
+                    break
+            except IndexError as e:
+                print(e)
+                continue
             print('Туда ходить нельзя, выберите другое место!')
