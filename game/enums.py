@@ -13,9 +13,9 @@ class Colors(Enum):
     def get_type_of_cells(self):
         match self:
             case Colors.black:
-                return TypesOfCells.black
+                return CellTypes.black
             case Colors.white:
-                return TypesOfCells.white
+                return CellTypes.white
 
 
 class TypesOfGames(Enum):
@@ -23,14 +23,25 @@ class TypesOfGames(Enum):
     multiplayer = 'multiplayer'
 
 
-class TypesOfCells(Enum):
-    black = 'b'
-    white = 'w'
+class CellTypes(Enum):
+    black = Colors.black
+    white = Colors.white
     empty = '.'
     border = 'x'
 
     def __str__(self):
+        if self.value == Colors.black:
+            return 'b'
+        if self.value == Colors.white:
+            return 'w'
         return self.value
 
-    def __repr__(self):
-        return self.value
+
+class CellStates(Enum):
+    unmarked = '-'
+    marked = '+'
+
+    def get_opposite(self):
+        if self.value == 'unmarked':
+            return CellStates.marked
+        return CellStates.unmarked

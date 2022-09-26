@@ -3,7 +3,7 @@ from PIL import ImageTk, Image
 from tkinter import messagebox
 from .settings import GameSettings
 from .request_response import StartGameResponse, MakeMoveByPlayerResponse, MakeMoveByAIResponse
-from .enums import TypesOfCells
+from .enums import CellTypes
 from .go import TypesOfGames, Colors
 
 # Root settings
@@ -168,11 +168,11 @@ class Display:
         pass_button.grid(row=field_size + 3, columnspan=field_size, pady=(20, 0))
         return game_field_ceil
 
-    def change_ceil_image(self, cell_type: TypesOfCells, label_to_change: tk.Label):
+    def change_ceil_image(self, cell_type: CellTypes, label_to_change: tk.Label):
         match cell_type:
-            case TypesOfCells.white:
+            case CellTypes.white:
                 image = self.white_ceil
-            case TypesOfCells.black:
+            case CellTypes.black:
                 image = self.black_ceil
             case _:
                 image = self.empty_ceil

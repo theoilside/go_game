@@ -1,5 +1,5 @@
 # Игра «Го (囲碁)»
-Версия 0.2
+Версия 0.3
 
 Авторы: [Михаил Ланец](https://github.com/theoilside), [Артемий Курганов](https://github.com/artemijkurganov)
 
