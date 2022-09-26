@@ -5,13 +5,19 @@ from PIL import ImageTk, Image
 
 class FrameStorage:
     def __init__(self, window):
-        self.window = window
+        self._window = window
         main_menu_bg_image = Image.open('./img/main_menu_bg.jpg')
-        self.main_menu_bg = ImageTk.PhotoImage(main_menu_bg_image)
+        self._main_menu_bg = ImageTk.PhotoImage(main_menu_bg_image)
 
-    def create_menu_frame(self):
-        menu_frame = tk.Frame(self.window, width=WIDTH, height=HEIGHT)
-        main_menu_bg_label = tk.Label(menu_frame, image=self.main_menu_bg)
+        self.menu_frame = self._create_menu_frame()
+        self.game_players_count_frame = self._create_menu_frame()
+        self.game_size_frame = self._create_menu_frame()
+
+        self.game_frame = tk.Frame(window)
+
+    def _create_menu_frame(self):
+        menu_frame = tk.Frame(self._window, width=WIDTH, height=HEIGHT)
+        main_menu_bg_label = tk.Label(menu_frame, image=self._main_menu_bg)
         main_menu_bg_label.place(x=0, y=0)
 
         menu_frame.pack_propagate(False)
