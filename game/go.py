@@ -49,6 +49,7 @@ class Board:
         self.board = generate_empty_board(self.size_with_borders)
         self.current_liberties = []
         self.current_groups = []
+        self.last_captured = []
 
     def __str__(self):
         array = []
@@ -76,19 +77,20 @@ class Board:
         # Берем ячейку с координатами на 1 больше, так как в эту функцию отправляются запросы без учета границ board.
         adjusted_x = x + 1
         adjusted_y = y + 1
+        captured = []
         initial_cell = self.get_cell(adjusted_x, adjusted_y)
         if initial_cell.type == CellTypes.empty and initial_cell.type != CellTypes.border:
             if color == Colors.black:
                 self.update_cell(initial_cell, CellTypes.black)
-                self.get_captured_groups(Colors.white)
+                captured = self.get_captured_groups(Colors.white)
             else:
                 self.update_cell(initial_cell, CellTypes.white)
-                self.get_captured_groups(Colors.black)
-            # self.compute_board_updates(color, adjusted_x, adjusted_y)
-            return True
-        return False
+                captured = self.get_captured_groups(Colors.black)
+            return {"success": True, "captured": captured}
+        return {"success": False, "captured": None}
 
     def get_captured_groups(self, color: Colors):
+        captured = []
         for x in range(self.size_with_borders):
             for y in range(self.size_with_borders):
                 cell = self.get_cell(x, y)
@@ -98,8 +100,9 @@ class Board:
                 if color_of_cell == cell.type:
                     self.compute_board_updates(color, x, y)
                     if len(self.current_liberties) == 0:
-                        self.capture_current_group()
+                        captured.append(self.capture_current_group())
                     self.restore_states()
+        return captured
 
     def compute_board_updates(self, color: Colors, x, y):
         cell = self.get_cell(x, y)
@@ -120,8 +123,11 @@ class Board:
             self.compute_board_updates(color, x - 1, y)
 
     def capture_current_group(self):
+        captured = []
         for i in range(len(self.current_groups)):
+            captured.append(self.current_groups[i])
             self.update_cell(self.current_groups[i], CellTypes.empty, CellStates.unmarked)
+        return captured
 
     def restore_states(self):
         self.current_groups.clear()

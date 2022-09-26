@@ -46,7 +46,7 @@ def singleplayer_cli():
         while True:
             print('Напишите свой ход в формате «x,y», где «x» и «y» — координаты')
             inputted_coords = input().split(',')
-            if game.place_piece(int(inputted_coords[0]), int(inputted_coords[1])):
+            if game.make_player_move(int(inputted_coords[0]), int(inputted_coords[1])).is_success:
                 break
             print('Туда ходить нельзя, выберите другое место!')
         print('Ходит компьютер...')
@@ -74,6 +74,6 @@ def multiplayer_cli():
             print(f'Сейчас ходят {game.color_of_current_move}')
             print('Напишите свой ход в формате «x,y», где «x» и «y» — координаты')
             inputted_coords = input().split(',')
-            if game.place_piece(int(inputted_coords[0]), int(inputted_coords[1])):
+            if game.make_player_move(int(inputted_coords[0]), int(inputted_coords[1])).is_success:
                 break
             print('Туда ходить нельзя, выберите другое место!')
