@@ -52,11 +52,17 @@ class Board:
         self.last_captured = []
 
     def __str__(self):
-        array = []
-        for row in self.board:
-            for element in row:
-                array.append(str(element))
+        array = ['   ']
+        row_index = 0
+        for column_index in range(self.size):
+            array.append(str(column_index) + ' ')
+        array.append('\n')
+        for row in self.board[1:-1]:
+            array.append(str(row_index) + '  ')
+            for element in row[1:-1]:
+                array.append(str(element) + ' ')
             array.append('\n')
+            row_index += 1
         return ''.join(array)
 
     def get_cell(self, x, y):

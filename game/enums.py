@@ -26,14 +26,14 @@ class TypesOfGames(Enum):
 class CellTypes(Enum):
     black = Colors.black
     white = Colors.white
-    empty = '.'
+    empty = '·'
     border = 'x'
 
     def __str__(self):
         if self.value == Colors.black:
-            return 'b'
+            return '■'
         if self.value == Colors.white:
-            return 'w'
+            return '○'
         return self.value
 
 
