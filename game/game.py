@@ -11,7 +11,7 @@ class Game:
 
     def start_new_game(self, size):
         self.board = Board(size)
-        return StartGameResponse(True, Colors.black)
+        return StartGameResponse(Colors.black)
 
     def make_player_move(self, x, y):
         logging.debug(f"Запрос на постановку фигуры {self.color_of_current_move} игроком в позицию {x}-{y}")
