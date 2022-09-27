@@ -49,19 +49,26 @@ class Board:
         self.board = generate_empty_board(self.size_with_borders)
         self.current_liberties = []
         self.current_groups = []
+        self.last_captured = []
 
     def __str__(self):
-        array = []
-        for row in self.board:
-            for element in row:
-                array.append(str(element))
+        array = ['   ']
+        row_index = 0
+        for column_index in range(self.size):
+            array.append(str(column_index) + ' ')
+        array.append('\n')
+        for row in self.board[1:-1]:
+            array.append(str(row_index) + '  ')
+            for element in row[1:-1]:
+                array.append(str(element) + ' ')
             array.append('\n')
+            row_index += 1
         return ''.join(array)
 
     def get_cell(self, x, y):
         if not (self.size_with_borders > x >= 0 and self.size_with_borders > y >= 0):
-            raise IndexError(f'x или y слишком большой/маленький! Полученные значения: {x} и {y}. Доступный диапазон: '
-                             f'[0, {self.size_with_borders}).')
+            raise IndexError(f'Координаты слишком большие/маленькие! Полученные значения: {x - 1} и {y - 1}. '
+                             f'Доступный диапазон: [0, {self.size}).')
         return self.board[y][x]
 
     def update_cell(self, cell: Cell, new_type: CellTypes = None, new_state: CellStates = None):
@@ -76,19 +83,20 @@ class Board:
         # Берем ячейку с координатами на 1 больше, так как в эту функцию отправляются запросы без учета границ board.
         adjusted_x = x + 1
         adjusted_y = y + 1
+        captured = []
         initial_cell = self.get_cell(adjusted_x, adjusted_y)
         if initial_cell.type == CellTypes.empty and initial_cell.type != CellTypes.border:
             if color == Colors.black:
                 self.update_cell(initial_cell, CellTypes.black)
-                self.get_captured_groups(Colors.white)
+                captured = self.get_captured_groups(Colors.white)
             else:
                 self.update_cell(initial_cell, CellTypes.white)
-                self.get_captured_groups(Colors.black)
-            # self.compute_board_updates(color, adjusted_x, adjusted_y)
-            return True
-        return False
+                captured = self.get_captured_groups(Colors.black)
+            return {"success": True, "captured": captured}
+        return {"success": False, "captured": None}
 
     def get_captured_groups(self, color: Colors):
+        captured = []
         for x in range(self.size_with_borders):
             for y in range(self.size_with_borders):
                 cell = self.get_cell(x, y)
@@ -98,8 +106,9 @@ class Board:
                 if color_of_cell == cell.type:
                     self.compute_board_updates(color, x, y)
                     if len(self.current_liberties) == 0:
-                        self.capture_current_group()
+                        captured.append(self.capture_current_group())
                     self.restore_states()
+        return captured
 
     def compute_board_updates(self, color: Colors, x, y):
         cell = self.get_cell(x, y)
@@ -120,8 +129,11 @@ class Board:
             self.compute_board_updates(color, x - 1, y)
 
     def capture_current_group(self):
+        captured = []
         for i in range(len(self.current_groups)):
+            captured.append(self.current_groups[i])
             self.update_cell(self.current_groups[i], CellTypes.empty, CellStates.unmarked)
+        return captured
 
     def restore_states(self):
         self.current_groups.clear()
