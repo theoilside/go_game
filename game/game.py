@@ -38,9 +38,9 @@ class Game:
     def update_overall_captured(self, new_captured):
         if new_captured:
             white_captured = True
-            if new_captured[0].type.value == Colors.black:
+            if new_captured[0][0].type.value == Colors.black:
                 white_captured = False
-            for i in range(len(new_captured)):
+            for i in range(len(new_captured[0])):
                 if white_captured:
                     self.captured_white += 1
                 else:
