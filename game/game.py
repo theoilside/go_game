@@ -20,6 +20,7 @@ class Game:
         result = self.place_piece(x, y)
         if result['success']:
             logging.debug(f"Фигура поставлена успешно")
+            self.update_overall_captured(result['captured'])
             return MakeMoveByPlayerResponse(True, self.color_of_current_move, result['captured'])
         logging.debug(f"Фигура не была поставлена")
         return MakeMoveByPlayerResponse(False, self.color_of_current_move, 'Cannot make move!')
@@ -35,7 +36,15 @@ class Game:
         return {'success': False, 'captured': None}
 
     def update_overall_captured(self, new_captured):
-        ...
+        if new_captured:
+            white_captured = True
+            if new_captured[0][0].type.value == Colors.black:
+                white_captured = False
+            for i in range(len(new_captured[0])):
+                if white_captured:
+                    self.captured_white += 1
+                else:
+                    self.captured_black += 1
 
     def end_game(self):
         ...

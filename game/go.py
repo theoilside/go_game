@@ -43,7 +43,7 @@ def generate_empty_board(size):
 
 
 class Board:
-    def __init__(self, size):
+    def __init__(self, size: int):
         self.size = size
         self.size_with_borders = size + 2
         self.board = generate_empty_board(self.size_with_borders)
@@ -83,7 +83,6 @@ class Board:
         # Берем ячейку с координатами на 1 больше, так как в эту функцию отправляются запросы без учета границ board.
         adjusted_x = x + 1
         adjusted_y = y + 1
-        captured = []
         initial_cell = self.get_cell(adjusted_x, adjusted_y)
         if initial_cell.type == CellTypes.empty and initial_cell.type != CellTypes.border:
             if color == Colors.black:
@@ -94,6 +93,9 @@ class Board:
                 captured = self.get_captured_groups(Colors.black)
             return {"success": True, "captured": captured}
         return {"success": False, "captured": None}
+
+    def check_for_suicide(self, cell: Cell):
+        ...
 
     def get_captured_groups(self, color: Colors):
         captured = []
