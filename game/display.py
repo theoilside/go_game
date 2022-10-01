@@ -4,7 +4,8 @@ from tkinter import messagebox
 from .display_repository.button_creator import ButtonCreator
 from .display_repository.game_settings import GameSettings
 from .display_repository.image_storage import ImageStorage
-from .request_response import StartGameResponse, MakeMoveByPlayerResponse, MakeMoveByAIResponse
+from .api import StartGameResponse, MakeMoveByPlayerResponse, MakeMoveByAIResponse
+from .enums import CellTypes
 from .go import TypesOfGames
 from .display_repository.consts import *
 from .display_repository.frame_storage import FrameStorage
@@ -14,7 +15,6 @@ class Display:
     def __init__(self, window):
         self.window = window
 
-        self.game_field_ceil = []
         self.game_settings = GameSettings()
         self.frame_storage = FrameStorage(window)
         self.image_storage = ImageStorage()
@@ -68,33 +68,37 @@ class Display:
 
         start_game_response: StartGameResponse = self.game_settings.game_state.start_new_game(size)
         self.game_settings.current_color = start_game_response.current_turn
-        self.game_field_ceil = self.init_game_field()
+        self.init_game_field()
         self.change_frame(self.frame_storage.game_size_frame, self.frame_storage.game_frame)
 
     def init_game_field(self):
-        self.game_settings.init_game_state(self.frame_storage.game_frame, self.game_settings.size,
-                                           self.on_game_cell_pressed)
-        self.game_settings.info_label.grid(row=0, columnspan=1 + self.game_settings.size)
+        self.game_settings.init_game_state(self.frame_storage.game_frame, self.on_game_cell_pressed)
+
         return self.game_settings.field_cell
 
     def on_game_cell_pressed(self, row, column):
         make_move_player_response: MakeMoveByPlayerResponse = \
             self.game_settings.game_state.make_player_move(x=column, y=row)
+
         if not make_move_player_response.is_success:
             # TODO: Вместо messagebox сделать вывод в стороне
             messagebox.showinfo('Нельзя сделать такой ход', make_move_player_response.error_message)
             return
 
+        for captured_group in make_move_player_response.captured_pieces:
+            for captured_cell in captured_group:
+                self.image_storage.change_ceil_image(CellTypes.empty,
+                                                     self.game_settings.field_cell[captured_cell.y-1][captured_cell.x-1])
+
         self.image_storage.change_ceil_image(
-            self.game_settings.current_color.get_type_of_cells(), self.game_field_ceil[row][column])
+            self.game_settings.current_color.get_type_of_cells(), self.game_settings.field_cell[row][column])
         self.game_settings.current_color = make_move_player_response.current_color
         self.game_settings.update_label()
 
         if self.game_settings.game_type == TypesOfGames.singleplayer:
             make_move_by_ai_response: MakeMoveByAIResponse = self.game_settings.game_state.make_ai_move()
-
             self.image_storage.change_ceil_image(self.game_settings.current_color.get_type_of_cells(),
-                                                 self.game_field_ceil[make_move_by_ai_response.y][
+                                                 self.game_settings.field_cell[make_move_by_ai_response.y][
                                                      make_move_by_ai_response.x])
 
             self.game_settings.current_color = make_move_by_ai_response.current_turn

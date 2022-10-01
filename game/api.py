@@ -1,5 +1,6 @@
-from typing import Optional
+from typing import Optional, List
 from game.enums import Colors
+from game.go import Cell
 
 
 class StartGameResponse:
@@ -8,11 +9,11 @@ class StartGameResponse:
 
 
 class MakeMoveByPlayerResponse:
-    def __init__(self, is_success: bool, current_turn: Colors, error_message=None, captured_pieces=None):
+    def __init__(self, is_success: bool, current_turn: Colors, captured_pieces=None, error_message=None):
         self.is_success: bool = is_success
         self.current_color: Colors = current_turn
         self.error_message: Optional[str] = error_message
-        self.captured_pieces = captured_pieces
+        self.captured_pieces: Optional[List[List[Cell]]] = captured_pieces
 
 
 class MakeMoveByAIResponse:

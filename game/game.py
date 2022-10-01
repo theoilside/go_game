@@ -1,4 +1,4 @@
-from .request_response import *
+from .api import *
 from .enums import Colors
 from .go import Board, AI
 import logging

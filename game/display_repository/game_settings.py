@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 import tkinter as tk
 
 from game.enums import TypesOfGames, Colors
@@ -14,8 +14,10 @@ class GameSettings:
         self.current_color: Colors = Colors.black
         self.game_state = SingleplayerGame()
         self.info_label: Optional[tk.Label] = None
-        self.field_cell = []
-        self.image_storage = ImageStorage()
+        self.field_cell: List[List[tk.Label]] = []
+
+        self._image_storage = ImageStorage()
+        self._cell_height: int = 0
 
     @property
     def game_type(self):
@@ -37,46 +39,80 @@ class GameSettings:
         if self.game_state == TypesOfGames.multiplayer:
             self._configure_label_multiplayer()
 
-    def init_game_state(self, game_frame, field_size, on_cell_pressed):
-        white_name = tk.Label(game_frame,
-                              text='Белый',
-                              background='white',
-                              font='Calibri 34',
-                              fg='black',
-                              width=10,
-                              )
-        white_name.grid(row=0, column=0, padx=20)
-
-        black_name = tk.Label(game_frame,
-                              text='Чёрный',
-                              background='black',
-                              font='Calibri 34',
-                              fg='white',
-                              width=10,
-                              )
-        black_name.grid(row=0, column=field_size + 1, padx=20)
-
-        for x in range(1, field_size + 1):
+    def init_game_state(self, game_frame, on_cell_pressed):
+        for x in range(self.size):
             game_row_ceil = []
-            for y in range(field_size):
+            for y in range(self.size):
                 btn = tk.Label(game_frame,
                                text=' ',
-                               image=self.image_storage.empty_cell,
+                               image=self._image_storage.empty_cell,
                                borderwidth=0,
                                highlightthickness=0,
+                               # width=50,
+                               # height=50,
                                )
-                btn.bind("<Button-1>", lambda e, a=x - 1, b=y: on_cell_pressed(a, b))
+                btn.bind("<Button-1>", lambda e, a=x, b=y: on_cell_pressed(a, b))
 
-                btn.grid(row=x, column=y + 1)
+                btn.grid(row=x + 1, column=y + 6)
                 game_row_ceil.append(btn)
             self.field_cell.append(game_row_ceil)
 
+        self._cell_height = self.field_cell[0][0].winfo_height()
+        self.create_white_state(game_frame)
+        self.create_black_state(game_frame)
+
         pass_button = tk.Button(game_frame, text='ПАСС', font='Calibri 34 bold', bg=BUTTON_COLOR,
                                 activebackground=BUTTON_PRESSED_COLOR, )
-        pass_button.grid(row=field_size + 3, columnspan=field_size, pady=(20, 0))
+        # pass_button.grid(row=field_size + 3, columnspan=field_size, pady=(20, 0))
 
         self.info_label = tk.Label(game_frame, font='Calibri 20')
         if self.game_type == TypesOfGames.multiplayer:
             self._configure_label_multiplayer()
         else:
             self._configure_label_singleplayer(self.current_color)
+
+        self.info_label.grid(row=0, column=6, columnspan=self.size)
+
+    def create_white_state(self, game_frame):
+        name = tk.Label(game_frame,
+                        text='Белый',
+                        background='white',
+                        font='Calibri 34',
+                        fg='black',
+                        borderwidth=0,
+                        highlightthickness=0,
+                        )
+        name.grid(row=0, column=0, padx=20)
+
+        score = tk.Label(game_frame,
+                         text='Счёт:',
+                         background='white',
+                         # font='Calibri 28',
+                         fg='black',
+                         height=self._cell_height-1,
+                         borderwidth=0,
+                         highlightthickness=0,
+                         )
+        score.grid(row=1, column=0, padx=20)
+
+    def create_black_state(self, game_frame):
+        name = tk.Label(game_frame,
+                        text='Чёрный',
+                        background='black',
+                        font='Calibri 34',
+                        fg='white',
+                        borderwidth=0,
+                        highlightthickness=0,
+                        )
+        name.grid(row=0, column=self.size + 6, padx=20)
+
+        score = tk.Label(game_frame,
+                         text='Счёт:',
+                         background='black',
+                         # font='Calibri 28',
+                         fg='white',
+                         height=self._cell_height-1,
+                         borderwidth=0,
+                         highlightthickness=0,
+                         )
+        score.grid(row=1, column=self.size + 6, padx=20)
