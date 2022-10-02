@@ -1,3 +1,4 @@
+import copy
 import random
 from game.enums import *
 
@@ -83,19 +84,25 @@ class Board:
         # Берем ячейку с координатами на 1 больше, так как в эту функцию отправляются запросы без учета границ board.
         adjusted_x = x + 1
         adjusted_y = y + 1
+        piece_type = CellTypes.black
+        if color == Colors.white:
+            piece_type = CellTypes.white
         initial_cell = self.get_cell(adjusted_x, adjusted_y)
         if initial_cell.type == CellTypes.empty and initial_cell.type != CellTypes.border:
-            if color == Colors.black:
-                self.update_cell(initial_cell, CellTypes.black)
-                captured = self.get_captured_groups(Colors.white)
-            else:
-                self.update_cell(initial_cell, CellTypes.white)
-                captured = self.get_captured_groups(Colors.black)
+            if self.is_suicide(initial_cell, piece_type):
+                return {"success": False, "captured": None}
+            captured = self.get_captured_groups(color.get_opposite())
             return {"success": True, "captured": captured}
         return {"success": False, "captured": None}
 
-    def check_for_suicide(self, cell: Cell):
-        ...
+    def is_suicide(self, initial_cell: Cell, new_type: CellTypes):
+        initial_board = copy.deepcopy(self.board)
+        self.update_cell(initial_cell, new_type)
+        captured = self.get_captured_groups(new_type.get_color())
+        if captured:
+            self.board = initial_board
+            return True
+        return False
 
     def get_captured_groups(self, color: Colors):
         captured = []
