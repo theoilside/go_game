@@ -1,4 +1,5 @@
 import copy
+import itertools
 import random
 from game.enums import *
 
@@ -45,12 +46,24 @@ def generate_empty_board(size):
 
 class Board:
     def __init__(self, size: int):
-        self.size = size
+        self.size: int = size
         self.size_with_borders = size + 2
         self.board = generate_empty_board(self.size_with_borders)
         self.current_liberties = []
         self.current_groups = []
         self.last_captured = []
+        self.previous_board: None | Board = None
+
+    def __eq__(self, other):
+        self_size = self.size_with_borders
+        other_size = other.size_with_borders
+        if self_size == other_size:
+            for i in range(self_size):
+                for j in range(self_size):
+                    if self.board[i][j].type != other.board[i][j].type:
+                        return False
+            return True
+        return False
 
     def __str__(self):
         array = ['   ']
@@ -89,20 +102,32 @@ class Board:
             piece_type = CellTypes.white
         initial_cell = self.get_cell(adjusted_x, adjusted_y)
         if initial_cell.type == CellTypes.empty and initial_cell.type != CellTypes.border:
-            if self.is_suicide(initial_cell, piece_type):
-                return {"success": False, "captured": None}
-            captured = self.get_captured_groups(color.get_opposite())
-            return {"success": True, "captured": captured}
+            result = self.if_permitted_move(initial_cell, piece_type)
+            if result[0]:
+
+                return {"success": True, "captured": result[1]}
         return {"success": False, "captured": None}
 
-    def is_suicide(self, initial_cell: Cell, new_type: CellTypes):
-        initial_board = copy.deepcopy(self.board)
+    def if_permitted_move(self, initial_cell: Cell, new_type: CellTypes):
+        # save current board
+        initial_board = copy.deepcopy(self)
+        # create next board
         self.update_cell(initial_cell, new_type)
-        captured = self.get_captured_groups(new_type.get_color())
-        if captured:
+        suicide_captured = [item for items in self.get_captured_groups(new_type.get_color()) for item in items]
+        if new_type == CellTypes.black:
+            opponent_captured = [item for items in self.get_captured_groups(Colors.white) for item in items]
+        else:
+            opponent_captured = [item for items in self.get_captured_groups(Colors.black) for item in items]
+        # check for suicide
+        if suicide_captured and not opponent_captured:
             self.board = initial_board
-            return True
-        return False
+            return False, None
+        self.remove_pieces(opponent_captured)
+        # check for ko
+        if self.previous_board and self.previous_board == self:
+            return False, None
+        self.previous_board = initial_board
+        return True, opponent_captured
 
     def get_captured_groups(self, color: Colors):
         captured = []
@@ -141,8 +166,12 @@ class Board:
         captured = []
         for i in range(len(self.current_groups)):
             captured.append(self.current_groups[i])
-            self.update_cell(self.current_groups[i], CellTypes.empty, CellStates.unmarked)
         return captured
+
+    def remove_pieces(self, captured: list):
+        if captured:
+            for i in range(len(captured)):
+                self.update_cell(captured[i], CellTypes.empty, CellStates.unmarked)
 
     def restore_states(self):
         self.current_groups.clear()

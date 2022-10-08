@@ -92,7 +92,8 @@ def multiplayer_cli():
                 continue
             inputted_coords = interface.split(',')
             try:
-                if game.make_player_move(int(inputted_coords[0]), int(inputted_coords[1])).is_success:
+                result = game.make_player_move(int(inputted_coords[0]), int(inputted_coords[1]))
+                if result.is_success:
                     break
             except IndexError as e:
                 print(e)
