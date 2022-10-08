@@ -1,6 +1,7 @@
 from .api import *
 from .enums import Colors
-from .go import Board, AI
+from .go import Board
+from .ai import AI
 import logging
 
 

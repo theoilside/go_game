@@ -1,17 +1,5 @@
 import copy
-import itertools
-import random
 from game.enums import *
-
-
-class AI:
-    def __init__(self, board):
-        self.board = board
-
-    def get_move(self):
-        x = random.randint(0, self.board.size - 1)
-        y = random.randint(0, self.board.size - 1)
-        return x, y
 
 
 class Cell:
@@ -104,7 +92,6 @@ class Board:
         if initial_cell.type == CellTypes.empty and initial_cell.type != CellTypes.border:
             result = self.if_permitted_move(initial_cell, piece_type)
             if result[0]:
-
                 return {"success": True, "captured": result[1]}
         return {"success": False, "captured": None}
 
@@ -120,11 +107,16 @@ class Board:
             opponent_captured = [item for items in self.get_captured_groups(Colors.black) for item in items]
         # check for suicide
         if suicide_captured and not opponent_captured:
-            self.board = initial_board
+            self.board = initial_board.board
+            self.previous_board = initial_board.previous_board
+            self.last_captured = initial_board.last_captured
             return False, None
         self.remove_pieces(opponent_captured)
         # check for ko
         if self.previous_board and self.previous_board == self:
+            self.board = initial_board.board
+            self.previous_board = initial_board.previous_board
+            self.last_captured = initial_board.last_captured
             return False, None
         self.previous_board = initial_board
         return True, opponent_captured
