@@ -85,8 +85,7 @@ class Display:
             messagebox.showinfo('Нельзя сделать такой ход', make_move_player_response.error_message)
             return
 
-        for captured_group in make_move_player_response.captured_pieces:
-            for captured_cell in captured_group:
+        for captured_cell in make_move_player_response.captured_pieces:
                 self.image_storage.change_ceil_image(CellTypes.empty,
                                                      self.game_settings.field_cell[captured_cell.y-1][captured_cell.x-1])
 
