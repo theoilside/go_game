@@ -22,3 +22,9 @@ class MakeMoveByAIResponse:
         self.y: int = y
         self.current_turn: Colors = current_turn
         self.captured_pieces = captured_pieces
+
+
+class GetCapturedPiecesResponse:
+    def __init__(self, white_count: int, black_count: int):
+        self.white_count = white_count
+        self.black_count = black_count
