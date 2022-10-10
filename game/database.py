@@ -19,9 +19,9 @@ class DatabaseAPI:
         self.connection.commit()
         cursor.close()
 
-    def get_from_table(self) -> List[Tuple[int, str, int]]:
+    def get_from_table(self) -> List[Tuple[str, int]]:
         cursor = self.connection.cursor()
-        sql_command = f'''SELECT *
+        sql_command = f'''SELECT name, score
         FROM {TABLE_NAME}'''
 
         cursor.execute(sql_command)
@@ -45,5 +45,3 @@ class DatabaseAPI:
 
         cursor.execute(sql_command)
         cursor.close()
-
-
