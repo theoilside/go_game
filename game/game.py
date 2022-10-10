@@ -22,20 +22,20 @@ class Game:
     def make_player_move(self, x, y):
         logging.debug(f"Запрос на постановку фигуры {self.color_of_current_move} игроком в позицию {x}-{y}")
         response = self.place_piece(x, y)
-        if response.is_permitted_move:
+        if response.is_success:
             logging.debug(f"Фигура поставлена успешно")
-            self.update_overall_captured(response.captured)
-            return MakeMoveByPlayerResponse(True, self.color_of_current_move, response.captured)
+            self._update_overall_captured(response.captured_pieces)
+            return MakeMoveByPlayerResponse(True, self.color_of_current_move, response.captured_pieces)
         logging.debug(f"Фигура не была поставлена")
         return MakeMoveByPlayerResponse(False, self.color_of_current_move, 'Cannot make move!')
 
     def place_piece(self, x, y):
         Response = namedtuple('Response', ('is_permitted_move', 'captured'), defaults=(False, None))
         result = self._place_piece(x, y)
-        if result['success']:
+        if result.is_permitted_move:
             logging.debug(f"Фигура поставлена успешно")
-            self._update_overall_captured(result['captured'])
-            return MakeMoveByPlayerResponse(True, self.color_of_current_move, result['captured'])
+            self._update_overall_captured(result.captured)
+            return MakeMoveByPlayerResponse(True, self.color_of_current_move, result.captured)
         logging.debug(f"Фигура не была поставлена")
         return MakeMoveByPlayerResponse(False, self.color_of_current_move, 'Cannot make move!')
 
@@ -54,6 +54,7 @@ class Game:
         return result
 
     def _place_piece(self, x, y):
+        Response = namedtuple('Response', ('is_permitted_move', 'captured'), defaults=(False, None))
         logging.debug(f'Попытка поставить фишку цвета {self.color_of_current_move} в клетку {x}-{y}')
         response = self.board.place_piece(self.color_of_current_move, x, y)
         if response.is_permitted_move:
@@ -100,8 +101,8 @@ class SingleplayerGame(Game):
             x, y = self.AI.get_move()
             logging.debug(f'Компьютер пытается сходить в клетку {x}-{y}')
             result = self._place_piece(x, y)
-            if result['success']:
-                captured = result['captured']
+            if result.is_permitted_move:
+                captured = result.captured
                 break
         logging.debug(f'Компьютер сходил в клетку {x}-{y}')
         return MakeMoveByAIResponse(x, y, self.color_of_current_move, captured)
