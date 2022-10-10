@@ -10,6 +10,7 @@ class FrameStorage:
         self._main_menu_bg = ImageTk.PhotoImage(main_menu_bg_image)
 
         self.menu_frame = self._create_menu_frame()
+        self.leaderboard_frame = self._create_menu_frame()
         self.game_players_count_frame = self._create_menu_frame()
         self.game_size_frame = self._create_menu_frame()
 

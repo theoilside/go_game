@@ -3,7 +3,7 @@ import tkinter as tk
 from .display_repository.button_creator import ButtonCreator
 from .display_repository.game_settings import GameSettings
 from .display_repository.image_storage import ImageStorage
-from .api import StartGameResponse, MakeMoveByPlayerResponse, MakeMoveByAIResponse
+from .api import *
 from .enums import CellTypes
 from .go import TypesOfGames
 from .display_repository.consts import *
@@ -20,6 +20,7 @@ class Display:
         self.element_creator = ButtonCreator()
 
         self.is_game_active = False
+        self.leaderboard: List[Tuple[str, int]] = []
 
         window.geometry(f'{WIDTH}x{HEIGHT}')
         window.title('Игра "Го"')
@@ -36,7 +37,9 @@ class Display:
                                            callback=lambda:
                                            self.change_frame(self.frame_storage.menu_frame,
                                                              self.frame_storage.game_players_count_frame))
-        self.element_creator.create_button('Настройки', self.frame_storage.menu_frame)
+        self.element_creator.create_button('Лидербоард', self.frame_storage.menu_frame,
+                                           callback=self.on_leaderboard_open)
+
         self.element_creator.create_button('Выход', self.frame_storage.menu_frame, callback=lambda: self.window.quit())
 
         # Frame with game type config
@@ -62,6 +65,23 @@ class Display:
                                            callback=lambda: self.change_frame(
                                                self.frame_storage.game_size_frame,
                                                self.frame_storage.game_players_count_frame))
+
+        # Frame with leaderboard config
+        if len(self.leaderboard) == 0:
+            self.element_creator.create_label('Таблица лидеров пуста', self.frame_storage.leaderboard_frame, width=20)
+        else:
+            self.element_creator.create_label('Таблица лидеров', self.frame_storage.leaderboard_frame, width=20)
+            for (name, score) in self.leaderboard:
+                self.element_creator.create_label(f'{name} : {score}', self.frame_storage.leaderboard_frame, width=30)
+
+        self.element_creator.create_button('Назад', self.frame_storage.leaderboard_frame, width=10,
+                                           callback=lambda: self.change_frame(self.frame_storage.leaderboard_frame,
+                                                                              self.frame_storage.menu_frame))
+
+    def on_leaderboard_open(self):
+        self.leaderboard = self.game_settings.game_state.get_leaderboard().leaderboard
+        self.change_frame(self.frame_storage.menu_frame,
+                          self.frame_storage.leaderboard_frame)
 
         # Frame with escape items config
         self.window.bind('<Escape>', lambda e: self.change_frame(self.frame_storage.game_frame,

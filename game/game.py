@@ -4,6 +4,7 @@ from .api import *
 from .enums import Colors
 from .go import Board
 from .ai import AI
+from .database import DatabaseAPI
 
 import logging
 
@@ -51,6 +52,12 @@ class Game:
 
         result = GetCapturedPiecesResponse()
         return result
+
+    @staticmethod
+    def get_leaderboard() -> GetLeaderboardResponse:
+        db_api = DatabaseAPI()
+        leaderboard = db_api.get_from_table()
+        return GetLeaderboardResponse(leaderboard)
 
     def _place_piece(self, x, y):
         Response = namedtuple('Response', ('is_permitted_move', 'captured'), defaults=(False, None))

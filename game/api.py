@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Tuple
 from game.enums import Colors
 from game.go import Cell
 
@@ -28,3 +28,8 @@ class GetCapturedPiecesResponse:
     def __init__(self, white_count: int, black_count: int):
         self.white_count = white_count
         self.black_count = black_count
+
+
+class GetLeaderboardResponse:
+    def __init__(self, leaderboard: List[Tuple[str, int]]):
+        self.leaderboard: List[Tuple[str, int]] = leaderboard
