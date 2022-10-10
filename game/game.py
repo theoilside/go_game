@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 from .api import *
 from .enums import Colors
 from .go import Board
@@ -18,24 +20,24 @@ class Game:
 
     def make_player_move(self, x, y):
         logging.debug(f"Запрос на постановку фигуры {self.color_of_current_move} игроком в позицию {x}-{y}")
-        result = self.place_piece(x, y)
-        if result['success']:
+        response = self.place_piece(x, y)
+        if response.is_permitted_move:
             logging.debug(f"Фигура поставлена успешно")
-            self.update_overall_captured(result['captured'])
-            return_value = MakeMoveByPlayerResponse(True, self.color_of_current_move, result['captured'])
-            return MakeMoveByPlayerResponse(True, self.color_of_current_move, result['captured'])
+            self.update_overall_captured(response.captured)
+            return MakeMoveByPlayerResponse(True, self.color_of_current_move, response.captured)
         logging.debug(f"Фигура не была поставлена")
         return MakeMoveByPlayerResponse(False, self.color_of_current_move, 'Cannot make move!')
 
     def place_piece(self, x, y):
+        Response = namedtuple('Response', ('is_permitted_move', 'captured'), defaults=(False, None))
         logging.debug(f'Попытка поставить фишку цвета {self.color_of_current_move} в клетку {x}-{y}')
-        result = self.board.place_piece(self.color_of_current_move, x, y)
-        if result['success']:
+        response = self.board.place_piece(self.color_of_current_move, x, y)
+        if response.is_permitted_move:
             self.color_of_current_move = self.color_of_current_move.get_opposite()
             logging.debug(f'Успешная попытка! Цвет текущего игрока сменился на {self.color_of_current_move}')
-            return {'success': True, 'captured': result['captured']}
+            return Response(True, response.captured)
         logging.debug(f'Поставить фишку цвета {self.color_of_current_move} в клетку {x}-{y} не удалось')
-        return {'success': False, 'captured': None}
+        return Response(False, None)
 
     def update_overall_captured(self, new_captured):
         if new_captured:

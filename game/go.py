@@ -1,4 +1,6 @@
 import copy
+from collections import namedtuple
+
 from game.enums import *
 
 
@@ -82,6 +84,7 @@ class Board:
         return True
 
     def place_piece(self, color: Colors, x, y):
+        Response = namedtuple('Response', ('is_permitted_move', 'captured'), defaults=(False, None))
         # Берем ячейку с координатами на 1 больше, так как в эту функцию отправляются запросы без учета границ board.
         adjusted_x = x + 1
         adjusted_y = y + 1
@@ -90,12 +93,13 @@ class Board:
             piece_type = CellTypes.white
         initial_cell = self.get_cell(adjusted_x, adjusted_y)
         if initial_cell.type == CellTypes.empty and initial_cell.type != CellTypes.border:
-            result = self.if_permitted_move(initial_cell, piece_type)
-            if result[0]:
-                return {"success": True, "captured": result[1]}
-        return {"success": False, "captured": None}
+            response = self.if_permitted_move(initial_cell, piece_type)
+            if response.is_permitted_move:
+                return Response(True, response.captured)
+        return Response(False, None)
 
     def if_permitted_move(self, initial_cell: Cell, new_type: CellTypes):
+        Response = namedtuple('Response', ('is_permitted_move', 'captured'), defaults=(False, None))
         # save current board
         initial_board = copy.deepcopy(self)
         # create next board
@@ -110,16 +114,19 @@ class Board:
             self.board = initial_board.board
             self.previous_board = initial_board.previous_board
             self.last_captured = initial_board.last_captured
-            return False, None
+            return Response()
         self.remove_pieces(opponent_captured)
         # check for ko
         if self.previous_board and self.previous_board == self:
             self.board = initial_board.board
             self.previous_board = initial_board.previous_board
             self.last_captured = initial_board.last_captured
-            return False, None
+            return Response()
         self.previous_board = initial_board
-        return True, opponent_captured
+        return Response(True, opponent_captured)
+
+    def count_score(self, color: Colors):
+        ...
 
     def get_captured_groups(self, color: Colors):
         captured = []
