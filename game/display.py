@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import messagebox
 
 from .display_repository.button_creator import ButtonCreator
 from .display_repository.game_settings import GameSettings
@@ -80,10 +79,13 @@ class Display:
         make_move_player_response: MakeMoveByPlayerResponse = \
             self.game_settings.game_state.make_player_move(x=column, y=row)
 
+        # Если ход сделать нельзя, вывести ошибку
         if not make_move_player_response.is_success:
-            self.game_settings.error_label.configure(text='Такой ход сделать нельзя')
+            self.game_settings.update_error_label(is_error=True)
             return
-        self.game_settings.error_label.configure(text='')
+        self.game_settings.update_error_label(is_error=False)
+
+        # Убрать с поля все захваченные фигуры
         for captured_cell in make_move_player_response.captured_pieces:
             self.image_storage.change_ceil_image(CellTypes.empty,
                                                  self.game_settings.field_cell[captured_cell.y - 1][
@@ -92,15 +94,19 @@ class Display:
         self.image_storage.change_ceil_image(
             self.game_settings.current_color.get_type_of_cells(), self.game_settings.field_cell[row][column])
         self.game_settings.current_color = make_move_player_response.current_color
-        self.game_settings.update_label()
+        self.game_settings.update_info_label()
 
-        if self.game_settings.game_type == TypesOfGames.singleplayer:
-            make_move_by_ai_response: MakeMoveByAIResponse = self.game_settings.game_state.make_ai_move()
-            self.image_storage.change_ceil_image(self.game_settings.current_color.get_type_of_cells(),
-                                                 self.game_settings.field_cell[make_move_by_ai_response.y][
-                                                     make_move_by_ai_response.x])
+        # Если игра многопользовательская, то не делать ничего
+        if self.game_settings.game_type == TypesOfGames.multiplayer:
+            return
 
-            self.game_settings.current_color = make_move_by_ai_response.current_turn
+        # Иначе ход сделает компьютер
+        make_move_by_ai_response: MakeMoveByAIResponse = self.game_settings.game_state.make_ai_move()
+        self.image_storage.change_ceil_image(self.game_settings.current_color.get_type_of_cells(),
+                                             self.game_settings.field_cell[make_move_by_ai_response.y][
+                                                 make_move_by_ai_response.x])
+
+        self.game_settings.current_color = make_move_by_ai_response.current_turn
 
 
 def start_gui():

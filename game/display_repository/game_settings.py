@@ -36,9 +36,12 @@ class GameSettings:
     def _configure_label_singleplayer(self, color_of_player: Colors):
         self.info_label.configure(text=f'Вы играете за {"белыx" if color_of_player == Colors.white else "чёрныx"}')
 
-    def update_label(self):
+    def update_info_label(self):
         if self.game_state == TypesOfGames.multiplayer:
             self._configure_label_multiplayer()
+
+    def update_error_label(self, is_error: bool):
+        self.error_label.configure(text='Такой ход сделать нельзя' if is_error else '')
 
     def init_game_state(self, game_frame, on_cell_pressed):
         for x in range(self.size):
@@ -57,8 +60,8 @@ class GameSettings:
             self.field_cell.append(game_row_ceil)
 
         self._cell_height = self.field_cell[0][0].winfo_height()
-        self.create_white_state(game_frame)
-        self.create_black_state(game_frame)
+        self._create_white_state(game_frame)
+        self._create_black_state(game_frame)
 
         self.info_label = tk.Label(game_frame, font='Calibri 20')
         if self.game_type == TypesOfGames.multiplayer:
@@ -71,7 +74,7 @@ class GameSettings:
         self.error_label = tk.Label(game_frame, font='Calibri 20')
         self.error_label.grid(row=self.size + 1, column=6, columnspan=self.size)
 
-    def create_white_state(self, game_frame):
+    def _create_white_state(self, game_frame):
         name = tk.Label(game_frame,
                         text='Белый',
                         background='white',
@@ -96,7 +99,7 @@ class GameSettings:
                                 activebackground=BUTTON_PRESSED_COLOR, fg='black')
         pass_button.grid(row=3, column=0, padx=20, rowspan=3)
 
-    def create_black_state(self, game_frame):
+    def _create_black_state(self, game_frame):
         name = tk.Label(game_frame,
                         text='Чёрный',
                         background='black',
