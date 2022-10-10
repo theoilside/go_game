@@ -19,6 +19,8 @@ class Display:
         self.image_storage = ImageStorage()
         self.element_creator = ButtonCreator()
 
+        self.is_game_active = False
+
         window.geometry(f'{WIDTH}x{HEIGHT}')
         window.title('Игра "Го"')
         window.iconbitmap(ICON_PATH)
@@ -43,6 +45,10 @@ class Display:
                                            callback=lambda: self.on_chosen_player_count(TypesOfGames.singleplayer))
         self.element_creator.create_button('Два игрока', self.frame_storage.game_players_count_frame,
                                            callback=lambda: self.on_chosen_player_count(TypesOfGames.multiplayer))
+        self.element_creator.create_button('Назад', self.frame_storage.game_players_count_frame,
+                                           callback=lambda: self.change_frame(
+                                               self.frame_storage.game_players_count_frame,
+                                               self.frame_storage.menu_frame))
 
         # Frame with field size config
         self.element_creator.create_label('Выберете размер игрового поля', self.frame_storage.game_size_frame, width=20)
@@ -52,6 +58,28 @@ class Display:
                                            callback=lambda: self.on_chosen_field_size(13))
         self.element_creator.create_button('19x19', self.frame_storage.game_size_frame, width=10,
                                            callback=lambda: self.on_chosen_field_size(19))
+        self.element_creator.create_button('Назад', self.frame_storage.game_size_frame, width=10,
+                                           callback=lambda: self.change_frame(
+                                               self.frame_storage.game_size_frame,
+                                               self.frame_storage.game_players_count_frame))
+
+        # Frame with escape items config
+        self.window.bind('<Escape>', lambda e: self.change_frame(self.frame_storage.game_frame,
+                                                                 self.frame_storage.escape_frame)
+        if self.is_game_active else None)
+
+        self.element_creator.create_button('Продолжить игру', self.frame_storage.escape_frame, width=20,
+                                           callback=lambda: self.change_frame(self.frame_storage.escape_frame,
+                                                                              self.frame_storage.game_frame))
+
+        self.element_creator.create_button('Выйти в главное меню', self.frame_storage.escape_frame, width=20,
+                                           callback=lambda: _exit_game_by_user())
+
+        def _exit_game_by_user():
+            self.change_frame(self.frame_storage.escape_frame,
+                              self.frame_storage.menu_frame)
+            self.game_settings.game_state.end_game()
+            self.is_game_active = False
 
     @staticmethod
     def change_frame(old_frame, new_frame):
@@ -69,6 +97,7 @@ class Display:
         self.game_settings.current_color = start_game_response.current_turn
         self.init_game_field()
         self.change_frame(self.frame_storage.game_size_frame, self.frame_storage.game_frame)
+        self.is_game_active = True
 
     def init_game_field(self):
         self.game_settings.init_game_state(self.frame_storage.game_frame, self.on_game_cell_pressed)
