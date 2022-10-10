@@ -7,6 +7,6 @@ BUTTON_PRESSED_COLOR = '#B88B5E'
 BLACK_COLOR = '#000000'
 
 EMPTY_CELL_PATH = './img/empty.png'
-BLACK_CELL_PATH = './img/white.png'
-WHITE_CELL_PATH = './img/black.png'
+BLACK_CELL_PATH = './img/black.png'
+WHITE_CELL_PATH = './img/white.png'
 ICON_PATH = './img/icon.ico'
