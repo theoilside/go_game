@@ -85,15 +85,18 @@ class GameSettings:
         name.grid(row=0, column=0, padx=20)
 
         score = tk.Label(game_frame,
-                         text='Счёт:',
+                         text='Количество\nзахватов: 0',
                          background='white',
-                         # font='Calibri 28',
+                         font='Calibri 28',
                          fg='black',
-                         height=self._cell_height-1,
                          borderwidth=0,
                          highlightthickness=0,
                          )
-        score.grid(row=1, column=0, padx=20)
+        score.grid(row=1, column=0, padx=20, rowspan=2)
+
+        pass_button = tk.Button(game_frame, text='ПАСС', font='Calibri 34 bold', bg='white',
+                                activebackground=BUTTON_PRESSED_COLOR, fg='black')
+        pass_button.grid(row=3, column=0, padx=20, rowspan=3)
 
     def create_black_state(self, game_frame):
         name = tk.Label(game_frame,
@@ -107,12 +110,15 @@ class GameSettings:
         name.grid(row=0, column=self.size + 6, padx=20)
 
         score = tk.Label(game_frame,
-                         text='Счёт:',
+                         text='Количество\nзахватов: 0',
                          background='black',
-                         # font='Calibri 28',
+                         font='Calibri 28',
                          fg='white',
-                         height=self._cell_height-1,
                          borderwidth=0,
                          highlightthickness=0,
                          )
-        score.grid(row=1, column=self.size + 6, padx=20)
+        score.grid(row=1, column=self.size + 6, padx=20, rowspan=2)
+
+        pass_button = tk.Button(game_frame, text='ПАСС', font='Calibri 34 bold', bg='black',
+                                activebackground=BUTTON_PRESSED_COLOR, fg='white')
+        pass_button.grid(row=3, column=self.size + 6, padx=20, rowspan=3)
