@@ -4,6 +4,7 @@ from .api import *
 from .enums import Colors
 from .go import Board
 from .ai import AI
+
 import logging
 
 
@@ -30,6 +31,29 @@ class Game:
 
     def place_piece(self, x, y):
         Response = namedtuple('Response', ('is_permitted_move', 'captured'), defaults=(False, None))
+        result = self._place_piece(x, y)
+        if result['success']:
+            logging.debug(f"Фигура поставлена успешно")
+            self._update_overall_captured(result['captured'])
+            return MakeMoveByPlayerResponse(True, self.color_of_current_move, result['captured'])
+        logging.debug(f"Фигура не была поставлена")
+        return MakeMoveByPlayerResponse(False, self.color_of_current_move, 'Cannot make move!')
+
+    def pass_button_pressed(self, color: Colors) -> None:
+        # TODO: Реализовать метод
+        # Вызывается каждый раз, когда пользователь нажал кнопку ПАСС
+        # Ничего не возвращает
+        ...
+
+    def get_captured_pieces(self) -> GetCapturedPiecesResponse:
+        # TODO: Реализовать метод
+        # Вызывается после каждого сделанного хода.
+        # Должен возвращать GetCapturedPiecesResponse
+
+        result = GetCapturedPiecesResponse()
+        return result
+
+    def _place_piece(self, x, y):
         logging.debug(f'Попытка поставить фишку цвета {self.color_of_current_move} в клетку {x}-{y}')
         response = self.board.place_piece(self.color_of_current_move, x, y)
         if response.is_permitted_move:
@@ -39,7 +63,7 @@ class Game:
         logging.debug(f'Поставить фишку цвета {self.color_of_current_move} в клетку {x}-{y} не удалось')
         return Response(False, None)
 
-    def update_overall_captured(self, new_captured):
+    def _update_overall_captured(self, new_captured):
         if new_captured:
             white_captured = True
             if new_captured[0].type.value == Colors.black:
@@ -71,12 +95,11 @@ class SingleplayerGame(Game):
         return response
 
     def make_ai_move(self):
-        captured = []
         logging.debug('Ход компьютера:')
         while True:
             x, y = self.AI.get_move()
             logging.debug(f'Компьютер пытается сходить в клетку {x}-{y}')
-            result = self.place_piece(x, y)
+            result = self._place_piece(x, y)
             if result['success']:
                 captured = result['captured']
                 break

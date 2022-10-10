@@ -14,6 +14,7 @@ class FrameStorage:
         self.game_size_frame = self._create_menu_frame()
 
         self.game_frame = tk.Frame(window)
+        self.escape_frame = self._create_menu_frame()
 
     def _create_menu_frame(self):
         menu_frame = tk.Frame(self._window, width=WIDTH, height=HEIGHT)
