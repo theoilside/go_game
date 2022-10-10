@@ -13,8 +13,8 @@ class Game:
     def __init__(self):
         self.board = None
         self.color_of_current_move = Colors.black
-        self.captured_black = 0
-        self.captured_white = 0
+        self._captured_black = 0
+        self._captured_white = 0
 
     def start_new_game(self, size):
         self.board = Board(size)
@@ -72,14 +72,12 @@ class Game:
 
     def _update_overall_captured(self, new_captured):
         if new_captured:
-            white_captured = True
-            if new_captured[0].type.name == 'black':
-                white_captured = False
+            white_captured = new_captured[0].type.name == 'white'
             for i in range(len(new_captured)):
                 if white_captured:
-                    self.captured_white += 1
+                    self._captured_white += 1
                 else:
-                    self.captured_black += 1
+                    self._captured_black += 1
 
     def end_game(self):
         ...

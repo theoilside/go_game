@@ -1,6 +1,6 @@
+from __future__ import annotations
 import copy
 from collections import namedtuple
-
 from game.enums import *
 
 
@@ -83,6 +83,15 @@ class Board:
         self.board[cell.y][cell.x] = Cell(new_type, new_state, cell.x, cell.y)
         return True
 
+    def replace_board(self, new_board: Board):
+        self.size = new_board.size
+        self.size_with_borders = new_board.size_with_borders
+        self.board = new_board.board
+        self.current_liberties = new_board.current_liberties
+        self.current_groups = new_board.current_groups
+        self.last_captured = new_board.last_captured
+        self.previous_board = new_board.previous_board
+
     def place_piece(self, color: Colors, x, y):
         Response = namedtuple('Response', ('is_permitted_move', 'captured'), defaults=(False, None))
         # Берем ячейку с координатами на 1 больше, так как в эту функцию отправляются запросы без учета границ board.
@@ -105,23 +114,16 @@ class Board:
         # create next board
         self.update_cell(initial_cell, new_type)
         suicide_captured = [item for items in self.get_captured_groups(new_type.get_color()) for item in items]
-        if new_type == CellTypes.black:
-            opponent_captured = [item for items in self.get_captured_groups(Colors.white) for item in items]
-        else:
-            opponent_captured = [item for items in self.get_captured_groups(Colors.black) for item in items]
+        opponent_captured = [item for items in self.get_captured_groups(new_type.get_opposite_color().get_color()) for item in items]
         # check for suicide
         if suicide_captured and not opponent_captured:
-            self.board = initial_board.board
-            self.previous_board = initial_board.previous_board
-            self.last_captured = initial_board.last_captured
-            return Response
+            self.replace_board(initial_board)
+            return Response(False, None)
         self.remove_pieces(opponent_captured)
         # check for ko
         if self.previous_board and self.previous_board == self:
-            self.board = initial_board.board
-            self.previous_board = initial_board.previous_board
-            self.last_captured = initial_board.last_captured
-            return Response
+            self.replace_board(initial_board)
+            return Response(False, None)
         self.previous_board = initial_board
         return Response(True, opponent_captured)
 
