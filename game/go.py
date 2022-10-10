@@ -114,14 +114,14 @@ class Board:
             self.board = initial_board.board
             self.previous_board = initial_board.previous_board
             self.last_captured = initial_board.last_captured
-            return Response()
+            return Response
         self.remove_pieces(opponent_captured)
         # check for ko
         if self.previous_board and self.previous_board == self:
             self.board = initial_board.board
             self.previous_board = initial_board.previous_board
             self.last_captured = initial_board.last_captured
-            return Response()
+            return Response
         self.previous_board = initial_board
         return Response(True, opponent_captured)
 

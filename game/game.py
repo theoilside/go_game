@@ -30,7 +30,6 @@ class Game:
         return MakeMoveByPlayerResponse(False, self.color_of_current_move, 'Cannot make move!')
 
     def place_piece(self, x, y):
-        Response = namedtuple('Response', ('is_permitted_move', 'captured'), defaults=(False, None))
         result = self._place_piece(x, y)
         if result.is_permitted_move:
             logging.debug(f"Фигура поставлена успешно")
@@ -67,7 +66,7 @@ class Game:
     def _update_overall_captured(self, new_captured):
         if new_captured:
             white_captured = True
-            if new_captured[0].type.value == Colors.black:
+            if new_captured[0].type.name == 'black':
                 white_captured = False
             for i in range(len(new_captured)):
                 if white_captured:
