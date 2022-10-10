@@ -14,6 +14,7 @@ class GameSettings:
         self.current_color: Colors = Colors.black
         self.game_state = SingleplayerGame()
         self.info_label: Optional[tk.Label] = None
+        self.error_label: Optional[tk.Label] = None
         self.field_cell: List[List[tk.Label]] = []
 
         self._image_storage = ImageStorage()
@@ -48,8 +49,6 @@ class GameSettings:
                                image=self._image_storage.empty_cell,
                                borderwidth=0,
                                highlightthickness=0,
-                               # width=50,
-                               # height=50,
                                )
                 btn.bind("<Button-1>", lambda e, a=x, b=y: on_cell_pressed(a, b))
 
@@ -61,10 +60,6 @@ class GameSettings:
         self.create_white_state(game_frame)
         self.create_black_state(game_frame)
 
-        pass_button = tk.Button(game_frame, text='ПАСС', font='Calibri 34 bold', bg=BUTTON_COLOR,
-                                activebackground=BUTTON_PRESSED_COLOR, )
-        # pass_button.grid(row=field_size + 3, columnspan=field_size, pady=(20, 0))
-
         self.info_label = tk.Label(game_frame, font='Calibri 20')
         if self.game_type == TypesOfGames.multiplayer:
             self._configure_label_multiplayer()
@@ -72,6 +67,9 @@ class GameSettings:
             self._configure_label_singleplayer(self.current_color)
 
         self.info_label.grid(row=0, column=6, columnspan=self.size)
+
+        self.error_label = tk.Label(game_frame, font='Calibri 20')
+        self.error_label.grid(row=self.size + 1, column=6, columnspan=self.size)
 
     def create_white_state(self, game_frame):
         name = tk.Label(game_frame,

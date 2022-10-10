@@ -81,10 +81,9 @@ class Display:
             self.game_settings.game_state.make_player_move(x=column, y=row)
 
         if not make_move_player_response.is_success:
-            # TODO: Вместо messagebox сделать вывод в стороне
-            messagebox.showinfo('Нельзя сделать такой ход', make_move_player_response.error_message)
+            self.game_settings.error_label.configure(text='Такой ход сделать нельзя')
             return
-
+        self.game_settings.error_label.configure(text='')
         for captured_cell in make_move_player_response.captured_pieces:
             self.image_storage.change_ceil_image(CellTypes.empty,
                                                  self.game_settings.field_cell[captured_cell.y - 1][
