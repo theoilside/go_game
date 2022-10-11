@@ -44,7 +44,17 @@ class CellTypes(Enum):
     def get_color(self):
         if self.value == Colors.black or self.value == Colors.white:
             return self.value
-        return ValueError('Невозможно получить цвет пустой клетки или границы поля!')
+        raise ValueError('Невозможно получить цвет пустой клетки или границы поля!')
+
+    def get_opposite_color(self):
+        match self:
+            case CellTypes.white:
+                return CellTypes.black
+            case CellTypes.black:
+                return CellTypes.white
+            case _:
+                raise ValueError('Невозможно получить противоположный цвет пустой клетки или границы поля!')
+
 
 
 class CellStates(Enum):
