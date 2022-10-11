@@ -45,13 +45,8 @@ class Game:
         # Ничего не возвращает
         ...
 
-    def get_captured_pieces(self) -> GetCapturedPiecesResponse:
-        # TODO: Реализовать метод
-        # Вызывается после каждого сделанного хода.
-        # Должен возвращать GetCapturedPiecesResponse
-
-        result = GetCapturedPiecesResponse()
-        return result
+    def get_captured_pieces_count(self) -> GetCapturedCountResponse:
+        return GetCapturedCountResponse(self._captured_white, self._captured_black)
 
     @staticmethod
     def get_leaderboard() -> GetLeaderboardResponse:

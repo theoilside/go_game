@@ -17,6 +17,9 @@ class GameSettings:
         self.error_label: Optional[tk.Label] = None
         self.field_cell: List[List[tk.Label]] = []
 
+        self.white_score: Optional[tk.Label] = None
+        self.black_score: Optional[tk.Label] = None
+
         self._image_storage = ImageStorage()
         self._cell_height: int = 0
 
@@ -94,6 +97,7 @@ class GameSettings:
                          highlightthickness=0,
                          )
         score.grid(row=1, column=0, padx=20, rowspan=2)
+        self.white_score = score
 
         pass_button = tk.Button(game_frame, text='ПАСС', font='Calibri 34 bold', bg='white',
                                 activebackground=BUTTON_PRESSED_COLOR, fg='black')
@@ -119,7 +123,12 @@ class GameSettings:
                          highlightthickness=0,
                          )
         score.grid(row=1, column=self.size + 6, padx=20, rowspan=2)
+        self.black_score = score
 
         pass_button = tk.Button(game_frame, text='ПАСС', font='Calibri 34 bold', bg='black',
                                 activebackground=BUTTON_PRESSED_COLOR, fg='white')
         pass_button.grid(row=3, column=self.size + 6, padx=20, rowspan=3)
+
+    def update_score(self, for_white: int, for_black: int):
+        self.white_score.configure(text=f'Количество\nзахватов: {for_white}')
+        self.black_score.configure(text=f'Количество\nзахватов: {for_black}')

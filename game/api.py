@@ -14,7 +14,7 @@ class MakeMoveByPlayerResponse:
         self.is_success: bool = is_success
         self.current_color: Colors = current_turn
         self.error_message: Optional[str] = error_message
-        self.captured_pieces: Optional[List[List[Cell]]] = captured_pieces
+        self.captured_pieces: Optional[List[Cell]] = captured_pieces
         self.is_last_available_move: bool = is_last_available_move
 
 
@@ -23,11 +23,11 @@ class MakeMoveByAIResponse:
         self.x: int = x
         self.y: int = y
         self.current_turn: Colors = current_turn
-        self.captured_pieces = captured_pieces
+        self.captured_pieces: Optional[List[Cell]] = captured_pieces
         self.is_last_available_move: bool = is_last_available_move
 
 
-class GetCapturedPiecesResponse:
+class GetCapturedCountResponse:
     def __init__(self, white_count: int, black_count: int):
         self.white_count = white_count
         self.black_count = black_count

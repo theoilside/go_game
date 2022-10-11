@@ -97,11 +97,6 @@ class Display:
                                            callback=lambda: self.change_frame(self.frame_storage.leaderboard_frame,
                                                                               self.frame_storage.menu_frame))
 
-    def on_leaderboard_open(self):
-        self.leaderboard = self.game_settings.game_state.get_leaderboard().leaderboard
-        self.change_frame(self.frame_storage.menu_frame,
-                          self.frame_storage.leaderboard_frame)
-
         # Frame with escape items config
         self.window.bind('<Escape>', lambda e: self.change_frame(self.frame_storage.game_frame,
                                                                  self.frame_storage.escape_frame)
@@ -117,8 +112,13 @@ class Display:
         def _exit_game_by_user():
             self.change_frame(self.frame_storage.escape_frame,
                               self.frame_storage.menu_frame)
-            self.game_settings.game_state.end_game()
+            self.game_settings = GameSettings()
             self.is_game_active = False
+
+    def on_leaderboard_open(self):
+        self.leaderboard = self.game_settings.game_state.get_leaderboard().leaderboard
+        self.change_frame(self.frame_storage.menu_frame,
+                          self.frame_storage.leaderboard_frame)
 
     @staticmethod
     def change_frame(old_frame, new_frame):
@@ -154,27 +154,30 @@ class Display:
         self.game_settings.update_error_label(is_error=False)
 
         # Убрать с поля все захваченные фигуры
-        for captured_cell in make_move_player_response.captured_pieces:
-            self.image_storage.change_ceil_image(CellTypes.empty,
-                                                 self.game_settings.field_cell[captured_cell.y - 1][
-                                                     captured_cell.x - 1])
+        self.clear_captured_pieces(make_move_player_response.captured_pieces)
 
         self.image_storage.change_ceil_image(
             self.game_settings.current_color.get_type_of_cells(), self.game_settings.field_cell[row][column])
         self.game_settings.current_color = make_move_player_response.current_color
         self.game_settings.update_info_label()
 
-        # Если игра многопользовательская, то не делать ничего
-        if self.game_settings.game_type == TypesOfGames.multiplayer:
-            return
+        if self.game_settings.game_type == TypesOfGames.singleplayer:
+            make_move_by_ai_response: MakeMoveByAIResponse = self.game_settings.game_state.make_ai_move()
+            self.clear_captured_pieces(make_move_by_ai_response.captured_pieces)
+            self.image_storage.change_ceil_image(self.game_settings.current_color.get_type_of_cells(),
+                                                 self.game_settings.field_cell[make_move_by_ai_response.y][
+                                                     make_move_by_ai_response.x])
 
-        # Иначе ход сделает компьютер
-        make_move_by_ai_response: MakeMoveByAIResponse = self.game_settings.game_state.make_ai_move()
-        self.image_storage.change_ceil_image(self.game_settings.current_color.get_type_of_cells(),
-                                             self.game_settings.field_cell[make_move_by_ai_response.y][
-                                                 make_move_by_ai_response.x])
+            self.game_settings.current_color = make_move_by_ai_response.current_turn
 
-        self.game_settings.current_color = make_move_by_ai_response.current_turn
+        current_score: GetCapturedCountResponse = self.game_settings.game_state.get_captured_pieces_count()
+        self.game_settings.update_score(current_score.white_count, current_score.black_count)
+
+    def clear_captured_pieces(self, captured_pieces: List[Cell]):
+        for captured_cell in captured_pieces:
+            self.image_storage.change_ceil_image(CellTypes.empty,
+                                                 self.game_settings.field_cell[captured_cell.y - 1][
+                                                     captured_cell.x - 1])
 
 
 def start_gui():
