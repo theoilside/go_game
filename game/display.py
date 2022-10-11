@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from .display_repository.button_creator import ButtonCreator
+from .display_repository.element_creator import ElementCreator
 from .display_repository.game_settings import GameSettings
 from .display_repository.image_storage import ImageStorage
 from .api import *
@@ -17,7 +17,7 @@ class Display:
         self.game_settings = GameSettings()
         self.frame_storage = FrameStorage(window)
         self.image_storage = ImageStorage()
-        self.element_creator = ButtonCreator()
+        self.element_creator = ElementCreator()
 
         self.is_game_active = False
         self.leaderboard: List[Tuple[str, int]] = []
@@ -37,8 +37,11 @@ class Display:
                                            callback=lambda:
                                            self.change_frame(self.frame_storage.menu_frame,
                                                              self.frame_storage.game_players_count_frame))
-        self.element_creator.create_button('Лидербоард', self.frame_storage.menu_frame,
+        self.element_creator.create_button('Лидерборд', self.frame_storage.menu_frame,
                                            callback=self.on_leaderboard_open)
+        self.element_creator.create_button('Правила игры', self.frame_storage.menu_frame,
+                                           callback=lambda: self.change_frame(self.frame_storage.menu_frame,
+                                                                              self.frame_storage.rule_frame))
 
         self.element_creator.create_button('Выход', self.frame_storage.menu_frame, callback=lambda: self.window.quit())
 
@@ -65,6 +68,22 @@ class Display:
                                            callback=lambda: self.change_frame(
                                                self.frame_storage.game_size_frame,
                                                self.frame_storage.game_players_count_frame))
+
+        # Frame with rules config
+        self.element_creator.create_label('Правила игры', self.frame_storage.rule_frame, width=20)
+
+        text = ' ' * 4 + f'\n\n{" " * 4}'.join(RULES)
+
+        rule_label = self.element_creator.create_label(text, self.frame_storage.rule_frame, width=60,
+                                                       font=CALIBRI_SMALL_FONT,
+                                                       justify='left')
+        self.element_creator.create_button('Назад', self.frame_storage.rule_frame, width=10,
+                                           callback=lambda: self.change_frame(self.frame_storage.rule_frame,
+                                                                              self.frame_storage.menu_frame))
+
+        scroll = tk.Scrollbar(self.frame_storage.rule_frame, orient=tk.VERTICAL)
+        scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        scroll.config(command=rule_label)
 
         # Frame with leaderboard config
         if len(self.leaderboard) == 0:
@@ -161,4 +180,5 @@ class Display:
 def start_gui():
     main_window = tk.Tk()
     display = Display(main_window)
+    main_window.focus_force()
     display.window.mainloop()

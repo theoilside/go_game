@@ -13,6 +13,7 @@ class FrameStorage:
         self.leaderboard_frame = self._create_menu_frame()
         self.game_players_count_frame = self._create_menu_frame()
         self.game_size_frame = self._create_menu_frame()
+        self.rule_frame = self._create_menu_frame()
 
         self.game_frame = tk.Frame(window)
         self.escape_frame = self._create_menu_frame()
