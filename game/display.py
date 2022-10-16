@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter.simpledialog import askstring
 
 from .display_repository.element_creator import ElementCreator
 from .display_repository.game_settings import GameSettings
@@ -42,11 +43,25 @@ class Display:
     def on_chosen_field_size(self, size):
         self.game_settings.size = size
 
-        start_game_response: StartGameResponse = self.game_settings.game_api.start_new_game(size)
-        self.game_settings.current_color = start_game_response.current_turn
         self.init_game_field()
         self.frame_storage.change_frame(self.frame_storage.game_size_frame, self.frame_storage.game_frame)
         self.frame_storage.is_game_active = True
+
+        if self.game_settings.game_type == TypesOfGames.singleplayer:
+            black_name = askstring('Имя', 'Как тебя зовут?')
+            black_name = 'Игрок' if black_name == '' else black_name
+            white_name = 'Компьютер'
+        else:
+            white_name = askstring('Белый', 'Как зовут белого игрока?')
+            black_name = askstring('Чёрный', 'Как зовут чёрного игрока?')
+            white_name = 'Белые' if white_name == '' else white_name
+            black_name = 'Чёрные' if black_name == '' else black_name
+
+        self.game_settings.configure_names(white_name, black_name)
+
+        start_game_response: StartGameResponse = self.game_settings.game_api.start_new_game(size, white_name,
+                                                                                            black_name)
+        self.game_settings.current_color = start_game_response.current_turn
 
     def on_exit_game_by_user(self):
         old_frame = self.frame_storage.escape_frame

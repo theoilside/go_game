@@ -21,6 +21,9 @@ class GameSettings:
         self.white_score: Optional[tk.Label] = None
         self.black_score: Optional[tk.Label] = None
 
+        self.white_name: Optional[tk.Label] = None
+        self.black_name: Optional[tk.Label] = None
+
         self._image_storage = ImageStorage()
 
     @property
@@ -87,6 +90,7 @@ class GameSettings:
                         highlightthickness=0,
                         )
         name.grid(row=0, column=0, padx=20)
+        self.white_name = name
 
         score = tk.Label(game_frame,
                          background='white',
@@ -115,6 +119,7 @@ class GameSettings:
                         )
         name.grid(row=0, column=self.size + 6, padx=20)
 
+        self.black_name = name
         score = tk.Label(game_frame,
                          background='black',
                          font='Calibri 28',
@@ -140,3 +145,8 @@ class GameSettings:
         pass_button_response: PassButtonResponse = self.game_api.pass_button_pressed(color)
         self.current_color = pass_button_response.current_turn
         self.update_info_label()
+
+    def configure_names(self, white: str, black: str):
+        self.white_name.configure(text=white)
+        self.black_name.configure(text=black)
+
