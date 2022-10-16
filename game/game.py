@@ -3,7 +3,7 @@ from collections import namedtuple
 from .api import *
 from .enums import Colors
 from .go import Board
-from .ai import AI
+from .ai import RandomAI, SmartAI
 from .database import DatabaseAPI
 
 import logging
@@ -83,7 +83,7 @@ class SingleplayerGame(Game):
         super().__init__()
         self.color_of_human = None
         self.color_of_AI = None
-        self.AI = None
+        self.AI: Optional[SmartAI | RandomAI] = None
 
     def start_new_game(self, size, color_of_human: Colors = Colors.black):
         logging.debug(
@@ -91,7 +91,7 @@ class SingleplayerGame(Game):
         self.color_of_human = color_of_human
         self.color_of_AI = color_of_human.get_opposite()
         response = super().start_new_game(size)
-        self.AI = AI(self.board)
+        self.AI = RandomAI(self.board)
         return response
 
     def make_ai_move(self):
@@ -106,6 +106,12 @@ class SingleplayerGame(Game):
         logging.debug(f'Компьютер сходил в клетку {x}-{y}')
         return MakeMoveByAIResponse(x, y, self.color_of_current_move, captured)
 
+    def pass_button_pressed(self, color: Colors) -> None:
+        if color != self.color_of_human:
+            raise ValueError(f'Color of pressed pass button ({color}) and color of human ({self.color_of_human} must '
+                             f'be equal. ')
+        super().pass_button_pressed(color)
+
 
 class MultiplayerGame(Game):
     def __init__(self):
@@ -114,3 +120,6 @@ class MultiplayerGame(Game):
     def start_new_game(self, size):
         logging.debug(f"Начало многопользовательской игры с размером игрового поля: {size}")
         return super().start_new_game(size)
+
+    def pass_button_pressed(self, color: Colors) -> None:
+        super().pass_button_pressed(color)

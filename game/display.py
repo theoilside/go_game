@@ -31,7 +31,7 @@ class Display:
         self.frame_storage.menu_frame.pack()
 
     def on_leaderboard_open(self):
-        self.frame_storage.leaderboard = self.game_settings.game_state.get_leaderboard().leaderboard
+        self.frame_storage.leaderboard = self.game_settings.game_api.get_leaderboard().leaderboard
         self.frame_storage.change_frame(self.frame_storage.menu_frame,
                                         self.frame_storage.leaderboard_frame)
 
@@ -42,7 +42,7 @@ class Display:
     def on_chosen_field_size(self, size):
         self.game_settings.size = size
 
-        start_game_response: StartGameResponse = self.game_settings.game_state.start_new_game(size)
+        start_game_response: StartGameResponse = self.game_settings.game_api.start_new_game(size)
         self.game_settings.current_color = start_game_response.current_turn
         self.init_game_field()
         self.frame_storage.change_frame(self.frame_storage.game_size_frame, self.frame_storage.game_frame)
@@ -64,7 +64,7 @@ class Display:
     def on_game_cell_pressed(self, row, column):
         # TODO: Вынести обработку нажатой клетки в отдельный модуль
         make_move_player_response: MakeMoveByPlayerResponse = \
-            self.game_settings.game_state.make_player_move(x=column, y=row)
+            self.game_settings.game_api.make_player_move(x=column, y=row)
 
         # Если ход сделать нельзя, вывести ошибку
         if not make_move_player_response.is_success:
@@ -81,7 +81,7 @@ class Display:
         self.game_settings.update_info_label()
 
         if self.game_settings.game_type == TypesOfGames.singleplayer:
-            make_move_by_ai_response: MakeMoveByAIResponse = self.game_settings.game_state.make_ai_move()
+            make_move_by_ai_response: MakeMoveByAIResponse = self.game_settings.game_api.make_ai_move()
             self.clear_captured_pieces(make_move_by_ai_response.captured_pieces)
             self.image_storage.change_ceil_image(self.game_settings.current_color.get_type_of_cells(),
                                                  self.game_settings.field_cell[make_move_by_ai_response.y][
@@ -89,7 +89,7 @@ class Display:
 
             self.game_settings.current_color = make_move_by_ai_response.current_turn
 
-        current_score: GetCapturedCountResponse = self.game_settings.game_state.get_captured_pieces_count()
+        current_score: GetCapturedCountResponse = self.game_settings.game_api.get_captured_pieces_count()
         self.game_settings.update_score(current_score.white_count, current_score.black_count)
 
     def clear_captured_pieces(self, captured_pieces: List[Cell]):
