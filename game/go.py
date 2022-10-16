@@ -5,8 +5,8 @@ from game.enums import *
 
 
 class Cell:
-    def __init__(self, type: CellTypes, state: CellStates, x: int, y: int):
-        self.type = type
+    def __init__(self, cell_type: CellTypes, state: CellStates, x: int, y: int):
+        self.type = cell_type
         self.state = state
         self.x = x
         self.y = y
@@ -114,7 +114,8 @@ class Board:
         # create next board
         self.update_cell(initial_cell, new_type)
         suicide_captured = [item for items in self.get_captured_groups(new_type.get_color()) for item in items]
-        opponent_captured = [item for items in self.get_captured_groups(new_type.get_opposite_color().get_color()) for item in items]
+        opponent_captured = [item for items in self.get_captured_groups(new_type.get_opposite_color().get_color()) for
+                             item in items]
         # check for suicide
         if suicide_captured and not opponent_captured:
             self.replace_board(initial_board)

@@ -65,6 +65,7 @@ class GameSettings:
         self._cell_height = self.field_cell[0][0].winfo_height()
         self._create_white_state(game_frame)
         self._create_black_state(game_frame)
+        self.update_score(0, 0)
 
         self.info_label = tk.Label(game_frame, font='Calibri 20')
         if self.game_type == TypesOfGames.multiplayer:
@@ -89,7 +90,6 @@ class GameSettings:
         name.grid(row=0, column=0, padx=20)
 
         score = tk.Label(game_frame,
-                         text='Количество\nзахватов: 0',
                          background='white',
                          font='Calibri 28',
                          fg='black',
@@ -100,7 +100,8 @@ class GameSettings:
         self.white_score = score
 
         pass_button = tk.Button(game_frame, text='ПАСС', font='Calibri 34 bold', bg='white',
-                                activebackground=BUTTON_PRESSED_COLOR, fg='black')
+                                activebackground=BUTTON_PRESSED_COLOR, fg='black',
+                                highlightbackground='white')  # For Mac OS
         pass_button.grid(row=3, column=0, padx=20, rowspan=3)
 
     def _create_black_state(self, game_frame):
@@ -115,7 +116,6 @@ class GameSettings:
         name.grid(row=0, column=self.size + 6, padx=20)
 
         score = tk.Label(game_frame,
-                         text='Количество\nзахватов: 0',
                          background='black',
                          font='Calibri 28',
                          fg='white',
@@ -126,7 +126,8 @@ class GameSettings:
         self.black_score = score
 
         pass_button = tk.Button(game_frame, text='ПАСС', font='Calibri 34 bold', bg='black',
-                                activebackground=BUTTON_PRESSED_COLOR, fg='white')
+                                activebackground=BUTTON_PRESSED_COLOR, fg='white',
+                                highlightbackground='black')  # For Mac OS
         pass_button.grid(row=3, column=self.size + 6, padx=20, rowspan=3)
 
     def update_score(self, for_white: int, for_black: int):

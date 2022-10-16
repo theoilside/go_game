@@ -30,6 +30,7 @@ class ElementCreator:
                            bg=BUTTON_COLOR,
                            activebackground=BUTTON_PRESSED_COLOR,
                            width=width,
+                           highlightbackground=BUTTON_COLOR,  # For Mac OS
                            )
 
         button.pack()

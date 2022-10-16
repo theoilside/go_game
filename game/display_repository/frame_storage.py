@@ -69,7 +69,7 @@ class FrameStorage:
         # Frame with rules config
         create_label('Правила игры', self.rule_frame, width=20)
 
-        text = ' ' * 4 + f'\n\n{" " * 4}'.join(RULES)
+        text = ' ' * 4 + f'\n\n{" " * 4}'.join(RULES)  # O_o
 
         create_label(text, self.rule_frame, width=60, font=CALIBRI_SMALL_FONT, justify='left')
         create_button('Назад', self.rule_frame, width=10,
@@ -95,8 +95,6 @@ class FrameStorage:
 
         create_button('Выйти в главное меню', self.escape_frame, width=20,
                       callback=lambda: exit_game_by_user())
-
-
 
     @staticmethod
     def change_frame(old_frame, new_frame):

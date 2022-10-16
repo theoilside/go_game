@@ -62,6 +62,7 @@ class Display:
         return self.game_settings.field_cell
 
     def on_game_cell_pressed(self, row, column):
+        # TODO: Вынести обработку нажатой клетки в отдельный модуль
         make_move_player_response: MakeMoveByPlayerResponse = \
             self.game_settings.game_state.make_player_move(x=column, y=row)
 
