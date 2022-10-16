@@ -45,9 +45,11 @@ class Game:
         # Ничего не возвращает
         if self.is_passed_last_turn:
             self.end_game()
+            return PassButtonResponse(self.color_of_current_move, True)
         else:
             self.is_passed_last_turn = True
             self.color_of_current_move = self.color_of_current_move.get_opposite()
+            return PassButtonResponse(self.color_of_current_move)
 
     def get_captured_pieces_count(self) -> GetCapturedCountResponse:
         return GetCapturedCountResponse(self._captured_white, self._captured_black)
@@ -115,11 +117,11 @@ class SingleplayerGame(Game):
         logging.debug(f'Компьютер сходил в клетку {x}-{y}')
         return MakeMoveByAIResponse(x, y, self.color_of_current_move, captured)
 
-    def pass_button_pressed(self, color: Colors) -> PassButtonResponse:
-        if color != self.color_of_human:
-            raise ValueError(f'Color of pressed pass button ({color}) and color of human ({self.color_of_human} must '
-                             f'be equal. ')
-        super().pass_button_pressed(color)
+    # def pass_button_pressed(self, color: Colors) -> PassButtonResponse:
+    #     if color != self.color_of_human:
+    #         raise ValueError(f'Color of pressed pass button ({color}) and color of human ({self.color_of_human} must '
+    #                          f'be equal. ')
+    #     super().pass_button_pressed(color)
 
 
 class MultiplayerGame(Game):
@@ -129,6 +131,3 @@ class MultiplayerGame(Game):
     def start_new_game(self, size):
         logging.debug(f"Начало многопользовательской игры с размером игрового поля: {size}")
         return super().start_new_game(size)
-
-    def pass_button_pressed(self, color: Colors) -> PassButtonResponse:
-        super().pass_button_pressed(color)

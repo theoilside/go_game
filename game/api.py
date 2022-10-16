@@ -39,5 +39,6 @@ class GetLeaderboardResponse:
 
 
 class PassButtonResponse:
-    def __init__(self, current_turn: Colors):
+    def __init__(self, current_turn: Colors, is_finished_game: bool = False):
         self.current_turn = current_turn
+        self.is_finished_game = is_finished_game
