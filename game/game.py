@@ -39,7 +39,8 @@ class Game:
         logging.debug(f"Фигура не была поставлена")
         return MakeMoveByPlayerResponse(False, self.color_of_current_move, 'Cannot make move!')
 
-    def pass_button_pressed(self, color: Colors) -> None:
+    def pass_button_pressed(self, color: Colors) -> PassButtonResponse:
+        # TODO: Реализовать метод
         # Вызывается каждый раз, когда пользователь нажал кнопку ПАСС
         # Ничего не возвращает
         if self.is_passed_last_turn:
@@ -114,7 +115,7 @@ class SingleplayerGame(Game):
         logging.debug(f'Компьютер сходил в клетку {x}-{y}')
         return MakeMoveByAIResponse(x, y, self.color_of_current_move, captured)
 
-    def pass_button_pressed(self, color: Colors) -> None:
+    def pass_button_pressed(self, color: Colors) -> PassButtonResponse:
         if color != self.color_of_human:
             raise ValueError(f'Color of pressed pass button ({color}) and color of human ({self.color_of_human} must '
                              f'be equal. ')
@@ -129,5 +130,5 @@ class MultiplayerGame(Game):
         logging.debug(f"Начало многопользовательской игры с размером игрового поля: {size}")
         return super().start_new_game(size)
 
-    def pass_button_pressed(self, color: Colors) -> None:
+    def pass_button_pressed(self, color: Colors) -> PassButtonResponse:
         super().pass_button_pressed(color)

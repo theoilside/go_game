@@ -5,6 +5,7 @@ from game.enums import TypesOfGames, Colors
 from game.game import SingleplayerGame, MultiplayerGame
 from .consts import *
 from .image_storage import ImageStorage
+from ..api import PassButtonResponse
 
 
 class GameSettings:
@@ -100,7 +101,7 @@ class GameSettings:
         pass_button = tk.Button(game_frame, text='ПАСС', font='Calibri 34 bold', bg='white',
                                 activebackground=BUTTON_PRESSED_COLOR, fg='black',
                                 highlightbackground='white',  # For Mac OS
-                                command=lambda: self.game_api.pass_button_pressed(Colors.white))
+                                command=lambda: self.on_pass_button_pressed(Colors.white))
         pass_button.grid(row=3, column=0, padx=20, rowspan=3)
 
     def _create_black_state(self, game_frame):
@@ -127,10 +128,15 @@ class GameSettings:
         pass_button = tk.Button(game_frame, text='ПАСС', font='Calibri 34 bold', bg='black',
                                 activebackground=BUTTON_PRESSED_COLOR, fg='white',
                                 highlightbackground='black',  # For Mac OS
-                                command=lambda: self.game_api.pass_button_pressed(Colors.black))
+                                command=lambda: self.on_pass_button_pressed(Colors.black))
 
         pass_button.grid(row=3, column=self.size + 6, padx=20, rowspan=3)
 
     def update_score(self, for_white: int, for_black: int):
         self.white_score.configure(text=f'Количество\nзахватов: {for_black}')
         self.black_score.configure(text=f'Количество\nзахватов: {for_white}')
+
+    def on_pass_button_pressed(self, color: Colors):
+        pass_button_response: PassButtonResponse = self.game_api.pass_button_pressed(color)
+        self.current_color = pass_button_response.current_turn
+        self.update_info_label()
