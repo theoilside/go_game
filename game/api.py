@@ -36,3 +36,8 @@ class GetCapturedCountResponse:
 class GetLeaderboardResponse:
     def __init__(self, leaderboard: List[Tuple[str, int]]):
         self.leaderboard: List[Tuple[str, int]] = leaderboard
+
+
+class PassButtonResponse:
+    def __init__(self, current_turn: Colors):
+        self.current_turn = current_turn
