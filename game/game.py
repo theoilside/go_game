@@ -25,7 +25,6 @@ class Game:
         response = self.place_piece(x, y)
         if response.is_success:
             logging.debug(f"Фигура поставлена успешно")
-            self._update_overall_captured(response.captured_pieces)
             return MakeMoveByPlayerResponse(True, self.color_of_current_move, response.captured_pieces)
         logging.debug(f"Фигура не была поставлена")
         return MakeMoveByPlayerResponse(False, self.color_of_current_move, 'Cannot make move!')
@@ -34,7 +33,6 @@ class Game:
         result = self._place_piece(x, y)
         if result.is_permitted_move:
             logging.debug(f"Фигура поставлена успешно")
-            self._update_overall_captured(result.captured)
             return MakeMoveByPlayerResponse(True, self.color_of_current_move, result.captured)
         logging.debug(f"Фигура не была поставлена")
         return MakeMoveByPlayerResponse(False, self.color_of_current_move, 'Cannot make move!')
@@ -60,6 +58,7 @@ class Game:
         response = self.board.place_piece(self.color_of_current_move, x, y)
         if response.is_permitted_move:
             self.color_of_current_move = self.color_of_current_move.get_opposite()
+            self._update_overall_captured(response.captured)
             logging.debug(f'Успешная попытка! Цвет текущего игрока сменился на {self.color_of_current_move}')
             return Response(True, response.captured)
         logging.debug(f'Поставить фишку цвета {self.color_of_current_move} в клетку {x}-{y} не удалось')
@@ -68,11 +67,14 @@ class Game:
     def _update_overall_captured(self, new_captured):
         if new_captured:
             white_captured = new_captured[0].type.name == 'white'
+            amount_of_captured = 0
             for i in range(len(new_captured)):
-                if white_captured:
-                    self._captured_white += 1
-                else:
-                    self._captured_black += 1
+                amount_of_captured += 1
+            amount_of_captured **= 1/2
+            if white_captured:
+                self._captured_white += int(amount_of_captured)
+            else:
+                self._captured_black += int(amount_of_captured)
 
     def end_game(self):
         ...

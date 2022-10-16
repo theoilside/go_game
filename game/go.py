@@ -138,7 +138,7 @@ class Board:
                 if cell.type == Colors.get_type_of_cells(color):
                     self.compute_board_updates(color, x, y)
                     if len(self.current_liberties) == 0:
-                        captured.append(self.capture_current_group())
+                        captured.append(self.get_current_captured_group())
                     self.restore_states()
         return captured
 
@@ -160,7 +160,7 @@ class Board:
             # Walk ←
             self.compute_board_updates(color, x - 1, y)
 
-    def capture_current_group(self):
+    def get_current_captured_group(self):
         captured = []
         for i in range(len(self.current_groups)):
             captured.append(self.current_groups[i])
