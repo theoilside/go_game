@@ -14,8 +14,15 @@ class Cell:
     def __str__(self):
         return str(self.type)
 
+    def __eq__(self, other: Cell):
+        return self.type == other.type and self.state == other.state and self.x == other.x and self.y == other.y
+
 
 def generate_empty_board(size):
+    if size < 0:
+        raise ValueError(f'Size must be non-negative. Got {size}')
+    if size > 19:
+        raise ValueError(f'Size is too large, 19 is maximum. Got {size}')
     board = []
     row = []
     for x in range(size):
