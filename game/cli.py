@@ -43,7 +43,8 @@ def singleplayer_cli():
         raise NameError(f'Неподходящие размеры. Получено: {board_size}. Допустим любой размер из диапазона [5, 19]')
     game.start_new_game(int(board_size), color_of_human)
     while True:
-        print(f'Белых захвачено: {game._captured_white}, черных захвачено: {game._captured_black}.')
+        captured_count = game.get_captured_pieces_count()
+        print(f'Белых захвачено: {captured_count.white_count}, черных захвачено: {captured_count.black_count}.')
         print(game.board)
         while True:
             print('Напишите свой ход в формате «x,y», где «x» и «y» — координаты')
@@ -80,9 +81,10 @@ def multiplayer_cli():
         raise NameError(f'Неподходящие размеры. Получено: {board_size}. Допустим любой размер из диапазона [5, 19]')
     game.start_new_game(int(board_size))
     while True:
+        captured_count = game.get_captured_pieces_count()
         print(game.board)
         print(f'→ Сейчас ходят {game.color_of_current_move}')
-        print(f'Белых захвачено: {game._captured_white}, черных захвачено: {game._captured_black}.')
+        print(f'Белых захвачено: {captured_count.white_count}, черных захвачено: {captured_count.black_count}.')
         while True:
             print('Напишите свой ход в формате x,y, где x и y — координаты')
             print('Ввод:', end=' ')
