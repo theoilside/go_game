@@ -43,6 +43,7 @@ class Board:
         self.current_groups = []
         self.last_captured = []
         self.previous_board: None | Board = None
+        self.current_borders = []
 
     def __eq__(self, other):
         self_size = self.size_with_borders
@@ -81,7 +82,6 @@ class Board:
         if not new_state:
             new_state = cell.state
         self.board[cell.y][cell.x] = Cell(new_type, new_state, cell.x, cell.y)
-        return True
 
     def replace_board(self, new_board: Board):
         self.size = new_board.size
@@ -127,25 +127,21 @@ class Board:
         self.previous_board = initial_board
         return Response(True, opponent_captured)
 
-    def count_score(self, color: Colors):
-        ...
-
     def get_captured_groups(self, color: Colors):
         captured = []
         for x in range(self.size_with_borders):
             for y in range(self.size_with_borders):
                 cell = self.get_cell(x, y)
-                color_of_cell = Colors.get_type_of_cells(color)
                 if cell.type == CellTypes.border:
                     continue
-                if color_of_cell == cell.type:
+                if cell.type == Colors.get_type_of_cells(color):
                     self.compute_board_updates(color, x, y)
                     if len(self.current_liberties) == 0:
                         captured.append(self.capture_current_group())
                     self.restore_states()
         return captured
 
-    def compute_board_updates(self, color: Colors, x, y):
+    def compute_board_updates(self, color: Colors, x: int, y: int):
         cell = self.get_cell(x, y)
         if cell.type == CellTypes.border:
             return
@@ -182,3 +178,47 @@ class Board:
                 cell = self.get_cell(x, y)
                 if cell.state == CellStates.marked:
                     self.update_cell(cell, None, CellStates.unmarked)
+
+
+class FinalizedBoard(Board):
+    def __init__(self, board: Board, size: int):
+        super().__init__(size)
+        self.board: Board = board
+        self.size_with_borders: int = board.size_with_borders
+        self.players_territory: list[list[Cell]] = []
+
+    def remove_cell_at(self, x, y):
+        adjusted_x = x + 1
+        adjusted_y = y + 1
+        self.board[adjusted_y][adjusted_x] = Cell(CellTypes.empty, CellStates.unmarked, adjusted_x, adjusted_y)
+
+    def count_territory(self, color: Colors):
+        # Using Flood fill algorithm
+        for x in range(self.size_with_borders):
+            for y in range(self.size_with_borders):
+                cell = self.get_cell(x, y)
+                self.players_territory.append([cell])
+                self.flood_fill(color, x, y)
+
+    def flood_fill(self, color: Colors, x: int, y: int):
+        cell = self.get_cell(x, y)
+        if cell.state == CellStates.marked or cell.type == Colors.get_type_of_cells(color):
+            return
+        if cell.type == CellTypes.get_opposite_color(color.get_type_of_cells()):
+            self.players_territory.pop()
+            return
+        if cell.type == CellTypes.empty:
+            self.update_cell(cell, None, CellStates.marked)
+            self.players_territory[-1].append(cell)
+            # Walk ↑
+            self.flood_fill(color, x, y - 1)
+            # Walk →
+            self.flood_fill(color, x + 1, y)
+            # Walk ↓
+            self.flood_fill(color, x, y + 1)
+            # Walk ←
+            self.flood_fill(color, x - 1, y)
+
+
+
+
