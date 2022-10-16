@@ -10,21 +10,21 @@ class StartGameResponse:
 
 class MakeMoveByPlayerResponse:
     def __init__(self, is_success: bool, current_turn: Colors, captured_pieces=None, error_message=None,
-                 is_last_available_move=False):
+                 end_game=False):
         self.is_success: bool = is_success
         self.current_color: Colors = current_turn
         self.error_message: Optional[str] = error_message
         self.captured_pieces: Optional[List[Cell]] = captured_pieces
-        self.is_last_available_move: bool = is_last_available_move
+        self.end_game: bool = end_game
 
 
 class MakeMoveByAIResponse:
-    def __init__(self, x: int, y: int, current_turn: Colors, captured_pieces=None, is_last_available_move=False):
+    def __init__(self, x: int, y: int, current_turn: Colors, captured_pieces=None, end_game=False):
         self.x: int = x
         self.y: int = y
         self.current_turn: Colors = current_turn
         self.captured_pieces: Optional[List[Cell]] = captured_pieces
-        self.is_last_available_move: bool = is_last_available_move
+        self.end_game: bool = end_game
 
 
 class GetCapturedCountResponse:
@@ -39,6 +39,6 @@ class GetLeaderboardResponse:
 
 
 class PassButtonResponse:
-    def __init__(self, current_turn: Colors, is_finished_game: bool = False):
+    def __init__(self, current_turn: Colors, end_game: bool = False):
         self.current_turn = current_turn
-        self.is_finished_game = is_finished_game
+        self.end_game = end_game
