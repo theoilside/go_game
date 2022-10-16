@@ -132,5 +132,5 @@ class GameSettings:
         pass_button.grid(row=3, column=self.size + 6, padx=20, rowspan=3)
 
     def update_score(self, for_white: int, for_black: int):
-        self.white_score.configure(text=f'Количество\nзахватов: {for_white}')
-        self.black_score.configure(text=f'Количество\nзахватов: {for_black}')
+        self.white_score.configure(text=f'Количество\nзахватов: {for_black}')
+        self.black_score.configure(text=f'Количество\nзахватов: {for_white}')
