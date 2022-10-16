@@ -13,6 +13,7 @@ class Game:
     def __init__(self):
         self.board = None
         self.color_of_current_move = Colors.black
+        self.is_passed_last_turn: bool = False
         self._captured_black = 0
         self._captured_white = 0
 
@@ -24,6 +25,7 @@ class Game:
         logging.debug(f"Запрос на постановку фигуры {self.color_of_current_move} игроком в позицию {x}-{y}")
         response = self.place_piece(x, y)
         if response.is_success:
+            self.is_passed_last_turn = False
             logging.debug(f"Фигура поставлена успешно")
             return MakeMoveByPlayerResponse(True, self.color_of_current_move, response.captured_pieces)
         logging.debug(f"Фигура не была поставлена")
@@ -38,10 +40,13 @@ class Game:
         return MakeMoveByPlayerResponse(False, self.color_of_current_move, 'Cannot make move!')
 
     def pass_button_pressed(self, color: Colors) -> None:
-        # TODO: Реализовать метод
         # Вызывается каждый раз, когда пользователь нажал кнопку ПАСС
         # Ничего не возвращает
-        ...
+        if self.is_passed_last_turn:
+            self.end_game()
+        else:
+            self.is_passed_last_turn = True
+            self.color_of_current_move = self.color_of_current_move.get_opposite()
 
     def get_captured_pieces_count(self) -> GetCapturedCountResponse:
         return GetCapturedCountResponse(self._captured_white, self._captured_black)
@@ -77,7 +82,7 @@ class Game:
                 self._captured_black += int(amount_of_captured)
 
     def end_game(self):
-        ...
+        print('УРААААА')
 
 
 class SingleplayerGame(Game):
@@ -103,6 +108,7 @@ class SingleplayerGame(Game):
             logging.debug(f'Компьютер пытается сходить в клетку {x}-{y}')
             result = self._place_piece(x, y)
             if result.is_permitted_move:
+                self.is_passed_last_turn = False
                 captured = result.captured
                 break
         logging.debug(f'Компьютер сходил в клетку {x}-{y}')
