@@ -50,7 +50,6 @@ class Board:
         self.current_groups = []
         self.last_captured = []
         self.previous_board: None | Board = None
-        self.current_borders = []
 
     def __eq__(self, other):
         self_size = self.size_with_borders
@@ -109,12 +108,12 @@ class Board:
             piece_type = CellTypes.white
         initial_cell = self.get_cell(adjusted_x, adjusted_y)
         if initial_cell.type == CellTypes.empty and initial_cell.type != CellTypes.border:
-            response = self.if_permitted_move(initial_cell, piece_type)
+            response = self.is_permitted_move(initial_cell, piece_type)
             if response.is_permitted_move:
                 return Response(True, response.captured)
         return Response(False, None)
 
-    def if_permitted_move(self, initial_cell: Cell, new_type: CellTypes):
+    def is_permitted_move(self, initial_cell: Cell, new_type: CellTypes):
         Response = namedtuple('Response', ('is_permitted_move', 'captured'), defaults=(False, None))
         # save current board
         initial_board = copy.deepcopy(self)

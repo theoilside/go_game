@@ -80,24 +80,39 @@ def multiplayer_cli():
     if not 4 < board_size < 20:
         raise NameError(f'Неподходящие размеры. Получено: {board_size}. Допустим любой размер из диапазона [5, 19]')
     game.start_new_game(int(board_size))
-    while True:
+    completed_game = False
+    while not completed_game:
         captured_count = game.get_captured_pieces_count()
-        print(game.board)
         print(f'→ Сейчас ходят {game.color_of_current_move}')
         print(f'Черные захватили: {captured_count.white_count}. Белые захватили: {captured_count.black_count}.')
+        print(game.board)
         while True:
-            print('Напишите свой ход в формате x,y, где x и y — координаты. Если')
+            print('Напишите свой ход в формате «x,y», где x и y — координаты. Для пропуска хода нажмите Enter.')
             print('Ввод:', end=' ')
             interface = input()
-            if not re.fullmatch(r'\d+,\d+', interface):
-                print('Некорректный ввод координат! Требуемый формат: x,y (например: 1,2).')
-                continue
-            inputted_coords = interface.split(',')
-            try:
-                result = game.make_player_move(int(inputted_coords[0]), int(inputted_coords[1]))
-                if result.is_success:
+            if interface:
+                if not re.fullmatch(r'\d+,\d+', interface):
+                    print('Некорректный ввод координат! Требуемый формат: x,y (например: 1,2).')
+                    continue
+                inputted_coords = interface.split(',')
+                try:
+                    result = game.make_player_move(int(inputted_coords[0]), int(inputted_coords[1]))
+                    if result.is_success:
+                        if result.end_game:
+                            print(f'→→→ Игра завершается из-за заполнения всей доски!')
+                            completed_game = True
+                        break
+                except IndexError as e:
+                    print(e)
+                    continue
+                print('Туда ходить нельзя, выберите другое место!')
+            else:
+                print(f'Игрок {game.color_of_current_move} пасанул.')
+                response = game.pass_button_pressed(game.color_of_current_move)
+                if response.end_game:
+                    print(f'→→→ Игра завершается из-за двух пасов подряд!')
+                    completed_game = True
                     break
-            except IndexError as e:
-                print(e)
-                continue
-            print('Туда ходить нельзя, выберите другое место!')
+                break
+    print('→ Итоговая доска:')
+    print(game.board)

@@ -5,7 +5,6 @@ from .enums import Colors
 from .go import Board
 from .ai import RandomAI, SmartAI
 from .database import DatabaseAPI
-
 import logging
 
 
@@ -13,6 +12,8 @@ class Game:
     def __init__(self):
         self.board = None
         self.color_of_current_move = Colors.black
+        self.black_name = 'Черные'
+        self.white_name = 'Белые'
         self.is_passed_last_turn: bool = False
         self._captured_black = 0
         self._captured_white = 0
@@ -20,6 +21,11 @@ class Game:
     def start_new_game(self, size):
         self.board = Board(size)
         return StartGameResponse(Colors.black)
+
+    def set_name(self, color: Colors, name: str):
+        # TODO: Реализовать метод
+        # Аргументы: цвет камней и имя, которое нужно присвоить игроку с такими камнями.
+        ...
 
     def make_player_move(self, x, y):
         logging.debug(f"Запрос на постановку фигуры {self.color_of_current_move} игроком в позицию {x}-{y}")
@@ -39,12 +45,10 @@ class Game:
         logging.debug(f"Фигура не была поставлена")
         return MakeMoveByPlayerResponse(False, self.color_of_current_move, 'Cannot make move!')
 
-    def pass_button_pressed(self, color: Colors) -> PassButtonResponse:
-        # TODO: Реализовать метод
-        # Вызывается каждый раз, когда пользователь нажал кнопку ПАСС
-        # Ничего не возвращает
+    def pass_button_pressed(self) -> PassButtonResponse:
+        # Вызывается, когда пользователь нажал кнопку ПАС
         if self.is_passed_last_turn:
-            self.end_game()
+            self._end_game()
             return PassButtonResponse(self.color_of_current_move, True)
         else:
             self.is_passed_last_turn = True
@@ -84,8 +88,25 @@ class Game:
             else:
                 self._captured_black += int(amount_of_captured)
 
-    def end_game(self):
-        print('УРААААА')
+    def remove_pieces(self, list_of_pieces: List[Cell]):
+        # TODO: Реализовать метод
+        # Аргумент: список камней, которые нужно убрать с доски.
+        ...
+
+    def _end_game(self, black_territory: int = None, white_territory: int = None):
+        # TODO: Реализовать метод
+        # Необязательные аргументы: заранее введенные площади черных/белых.
+        ...
+
+    def get_score(self):
+        # TODO: Реализовать метод
+        # Возвращает очки обоих игроков.
+        ...
+
+    def add_score_to_leaderboard(self):
+        # TODO: Реализовать метод
+        # Добавляет результат метода get_score в бд лидерборда.
+        ...
 
 
 class SingleplayerGame(Game):
