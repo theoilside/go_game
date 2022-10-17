@@ -18,7 +18,7 @@ class Game:
         self._captured_black = 0
         self._captured_white = 0
 
-    def start_new_game(self, size):
+    def start_new_game(self, size: int, white_name: str, black_name: str):
         self.board = Board(size)
         return StartGameResponse(Colors.black)
 
@@ -82,7 +82,7 @@ class Game:
             amount_of_captured = 0
             for i in range(len(new_captured)):
                 amount_of_captured += 1
-            amount_of_captured **= 1/2
+            amount_of_captured **= 1 / 2
             if white_captured:
                 self._captured_white += int(amount_of_captured)
             else:
@@ -116,12 +116,13 @@ class SingleplayerGame(Game):
         self.color_of_AI = None
         self.AI: Optional[SmartAI | RandomAI] = None
 
-    def start_new_game(self, size, color_of_human: Colors = Colors.black):
+    def start_new_game(self, size, white_name: str, black_name: str, color_of_human: Colors = Colors.black):
         logging.debug(
             f"Начало одиночной игры с размером игрового поля: {size} и цветом игрока-человека {color_of_human}")
+
         self.color_of_human = color_of_human
         self.color_of_AI = color_of_human.get_opposite()
-        response = super().start_new_game(size)
+        response = super().start_new_game(size, white_name, black_name)
         self.AI = RandomAI(self.board)
         return response
 
@@ -149,6 +150,6 @@ class MultiplayerGame(Game):
     def __init__(self):
         super().__init__()
 
-    def start_new_game(self, size):
+    def start_new_game(self, size, white_name: str, black_name: str):
         logging.debug(f"Начало многопользовательской игры с размером игрового поля: {size}")
-        return super().start_new_game(size)
+        return super().start_new_game(size, white_name, black_name)
