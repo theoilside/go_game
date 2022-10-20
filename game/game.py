@@ -2,7 +2,7 @@ from collections import namedtuple
 
 from .api import *
 from .enums import Colors
-from .go import Board
+from .go import Board, FinalizedBoard
 from .ai import RandomAI, SmartAI
 from .database import DatabaseAPI
 import logging
@@ -96,7 +96,16 @@ class Game:
     def _end_game(self, black_territory: int = None, white_territory: int = None):
         # TODO: Реализовать метод
         # Необязательные аргументы: заранее введенные площади черных/белых.
-        ...
+        self.board = FinalizedBoard(self.board)
+        black_points = self.board.count_territory(Colors.black)
+        white_points = self.board.count_territory(Colors.white)
+        print(f'У черных {len(black_points)} очков. Территория черных:')
+        for cell in black_points:
+            print(f'{cell.x},{cell.y}', end='; ')
+        print()
+        print(f'У белых {len(white_points)} очков. Территория белых:')
+        for cell in white_points:
+            print(f'{cell.x},{cell.y}', end='; ')
 
     def get_score(self):
         # TODO: Реализовать метод

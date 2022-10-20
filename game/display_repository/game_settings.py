@@ -142,7 +142,7 @@ class GameSettings:
         self.black_score.configure(text=f'Количество\nзахватов: {for_white}')
 
     def on_pass_button_pressed(self, color: Colors):
-        pass_button_response: PassButtonResponse = self.game_api.pass_button_pressed(color)
+        pass_button_response: PassButtonResponse = self.game_api.pass_button_pressed()
         self.current_color = pass_button_response.current_turn
         self.update_info_label()
 

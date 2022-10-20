@@ -21,8 +21,8 @@ class Cell:
 def generate_empty_board(size):
     if size < 0:
         raise ValueError(f'Size must be non-negative. Got {size}')
-    if size > 19:
-        raise ValueError(f'Size is too large, 19 is maximum. Got {size}')
+    if size > 21:
+        raise ValueError(f'Size is too large, 21 is maximum. Got {size}')
     board = []
     row = []
     for x in range(size):
@@ -188,11 +188,18 @@ class Board:
 
 
 class FinalizedBoard(Board):
-    def __init__(self, board: Board, size: int):
-        super().__init__(size)
-        self.board: Board = board
+    def __init__(self, board: Board):
+        super().__init__(board.size)
+        self.board: list[list[Cell]] = board.board
         self.size_with_borders: int = board.size_with_borders
-        self.players_territory: list[list[Cell]] = []
+        self.players_territory: list[list[Cell]] = [[]]
+        self.met_opponent = False
+
+    def get_cell(self, x, y):
+        if not (self.size_with_borders > x >= 0 and self.size_with_borders > y >= 0):
+            raise IndexError(f'Координаты слишком большие/маленькие! Полученные значения: {x - 1} и {y - 1}. '
+                             f'Доступный диапазон: [0, {self.size}).')
+        return self.board[y][x]
 
     def remove_cell_at(self, x, y):
         adjusted_x = x + 1
@@ -204,28 +211,64 @@ class FinalizedBoard(Board):
         for x in range(self.size_with_borders):
             for y in range(self.size_with_borders):
                 cell = self.get_cell(x, y)
-                self.players_territory.append([cell])
-                self.flood_fill(color, x, y)
+                if cell.state.unmarked:
+                    self.met_opponent = False
+                    self.players_territory.append([])
+                    self.flood_fill(color, x, y)
+                    self.players_territory = [x for x in self.players_territory if x]
+        territory_array = copy.deepcopy(sum(self.players_territory, []))
+        self.restore_board()
+        return self.get_unique_cells(territory_array)
 
     def flood_fill(self, color: Colors, x: int, y: int):
-        cell = self.get_cell(x, y)
-        if cell.state == CellStates.marked or cell.type == Colors.get_type_of_cells(color):
-            return
-        if cell.type == CellTypes.get_opposite_color(color.get_type_of_cells()):
-            self.players_territory.pop()
-            return
-        if cell.type == CellTypes.empty:
-            self.update_cell(cell, None, CellStates.marked)
-            self.players_territory[-1].append(cell)
-            # Walk ↑
-            self.flood_fill(color, x, y - 1)
-            # Walk →
-            self.flood_fill(color, x + 1, y)
-            # Walk ↓
-            self.flood_fill(color, x, y + 1)
-            # Walk ←
-            self.flood_fill(color, x - 1, y)
+        if not self.met_opponent:
+            cell = self.get_cell(x, y)
+            if cell.state == CellStates.marked or cell.type == Colors.get_type_of_cells(color):
+                return
+            if cell.type == CellTypes.get_opposite_color(color.get_type_of_cells()):
+                if self.players_territory and self.players_territory[-1]:
+                    self.players_territory.pop()
+                self.mark_only_territory()
+                self.met_opponent = True
+                return
+            if cell.type == CellTypes.empty:
+                if cell.x == 1 and cell.y == 6:
+                    hello = 'world'
+                self.update_cell(cell, None, CellStates.marked)
+                self.players_territory[-1].append(cell)
+                # Walk ↑
+                self.flood_fill(color, x, y - 1)
+                # Walk →
+                self.flood_fill(color, x + 1, y)
+                # Walk ↓
+                self.flood_fill(color, x, y + 1)
+                # Walk ←
+                self.flood_fill(color, x - 1, y)
 
+    def mark_only_territory(self):
+        for x in range(self.size_with_borders):
+            for y in range(self.size_with_borders):
+                cell = self.get_cell(x, y)
+                if cell.state == CellStates.marked and cell not in sum([x for x in self.players_territory if x], []):
+                    self.update_cell(cell, None, CellStates.unmarked)
 
+    def restore_board(self):
+        self.met_opponent = False
+        self.players_territory.clear()
+        for x in range(self.size_with_borders):
+            for y in range(self.size_with_borders):
+                cell = self.get_cell(x, y)
+                if cell.state == CellStates.marked:
+                    self.update_cell(cell, None, CellStates.unmarked)
 
-
+    def get_unique_cells(self, list_of_cells: list[Cell]):
+        unique_coordinates = []
+        unique_cells = []
+        for cell in list_of_cells:
+            coordinates = cell.x, cell.y
+            if coordinates in unique_coordinates:
+                continue
+            unique_coordinates.append(coordinates)
+        for coordinate in unique_coordinates:
+            unique_cells.append(self.get_cell(coordinate[0], coordinate[1]))
+        return unique_cells
