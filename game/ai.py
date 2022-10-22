@@ -23,4 +23,9 @@ class RandomAI(AI):
 class SmartAI(AI):
     def __init__(self, board):
         super().__init__(board)
-        raise Exception('SmartAI is not implemented')
+
+    def get_move(self):
+        super().get_move()
+        x = random.randint(0, self.board.size - 1)
+        y = random.randint(0, self.board.size - 1)
+        return x, y

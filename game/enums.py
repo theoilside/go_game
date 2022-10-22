@@ -56,7 +56,6 @@ class CellTypes(Enum):
                 raise ValueError('Невозможно получить противоположный цвет пустой клетки или границы поля!')
 
 
-
 class CellStates(Enum):
     unmarked = '-'
     marked = '+'
@@ -65,3 +64,8 @@ class CellStates(Enum):
         if self.value == 'unmarked':
             return CellStates.marked
         return CellStates.unmarked
+
+
+class AILevel(Enum):
+    random = 'random'
+    smart = 'smart'

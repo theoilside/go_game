@@ -1,11 +1,12 @@
 from collections import namedtuple
-
 from .api import *
-from .enums import Colors
+from .enums import Colors, CellStates, CellTypes, AILevel
 from .go import Board, FinalizedBoard
 from .ai import RandomAI, SmartAI
 from .database import DatabaseAPI
 import logging
+
+KOMI = 6.5
 
 
 class Game:
@@ -17,15 +18,14 @@ class Game:
         self.is_passed_last_turn: bool = False
         self._captured_black = 0
         self._captured_white = 0
+        self.black_points = 0
+        self.white_points = 0
 
-    def start_new_game(self, size: int, white_name: str, black_name: str):
+    def start_new_game(self, size: int, black_name: str, white_name: str):
         self.board = Board(size)
+        self.black_name = black_name
+        self.white_name = white_name
         return StartGameResponse(Colors.black)
-
-    def set_name(self, color: Colors, name: str):
-        # TODO: Реализовать метод
-        # Аргументы: цвет камней и имя, которое нужно присвоить игроку с такими камнями.
-        ...
 
     def make_player_move(self, x, y):
         logging.debug(f"Запрос на постановку фигуры {self.color_of_current_move} игроком в позицию {x}-{y}")
@@ -45,15 +45,14 @@ class Game:
         logging.debug(f"Фигура не была поставлена")
         return MakeMoveByPlayerResponse(False, self.color_of_current_move, 'Cannot make move!')
 
-    def pass_button_pressed(self) -> PassButtonResponse:
+    def pass_button_pressed(self, pass_by_only_human: bool = False) -> PassButtonResponse:
         # Вызывается, когда пользователь нажал кнопку ПАС
-        if self.is_passed_last_turn:
-            self._end_game()
+        if self.is_passed_last_turn or pass_by_only_human:
+            self.finalize_board()
             return PassButtonResponse(self.color_of_current_move, True)
-        else:
-            self.is_passed_last_turn = True
-            self.color_of_current_move = self.color_of_current_move.get_opposite()
-            return PassButtonResponse(self.color_of_current_move)
+        self.is_passed_last_turn = True
+        self.color_of_current_move = self.color_of_current_move.get_opposite()
+        return PassButtonResponse(self.color_of_current_move)
 
     def get_captured_pieces_count(self) -> GetCapturedCountResponse:
         return GetCapturedCountResponse(self._captured_white, self._captured_black)
@@ -88,29 +87,30 @@ class Game:
             else:
                 self._captured_black += int(amount_of_captured)
 
-    def remove_pieces(self, list_of_pieces: List[Cell]):
-        # TODO: Реализовать метод
-        # Аргумент: список камней, которые нужно убрать с доски.
-        ...
+    def remove_pieces_at_coords(self, list_of_coords: List[Tuple[int, int]]):
+        # Аргумент: список координат в формате Tuple, по которому нужно убрать с доски.
+        removed_cells = []
+        for coord in list_of_coords:
+            adjusted_x = coord[0] + 1
+            adjusted_y = coord[1] + 1
+            cell = self.board.get_cell(adjusted_x, adjusted_y)
+            removed_cells.append(cell)
+            self.board.update_cell(cell, CellTypes.empty, CellStates.unmarked)
+        return RemoveCellsResponse(removed_cells)
 
-    def _end_game(self, black_territory: int = None, white_territory: int = None):
-        # TODO: Реализовать метод
-        # Необязательные аргументы: заранее введенные площади черных/белых.
+    def finalize_board(self):
         self.board = FinalizedBoard(self.board)
-        black_points = self.board.count_territory(Colors.black)
-        white_points = self.board.count_territory(Colors.white)
-        print(f'У черных {len(black_points)} очков. Территория черных:')
-        for cell in black_points:
-            print(f'{cell.x},{cell.y}', end='; ')
-        print()
-        print(f'У белых {len(white_points)} очков. Территория белых:')
-        for cell in white_points:
-            print(f'{cell.x},{cell.y}', end='; ')
+        return EndGameResponse()
 
-    def get_score(self):
-        # TODO: Реализовать метод
-        # Возвращает очки обоих игроков.
-        ...
+    def count_points(self, black_territory: int = None, white_territory: int = None):
+        # Необязательные аргументы: заранее введенные площади черных/белых.
+        if black_territory and white_territory:
+            self.black_points = black_territory - self._captured_black
+            self.white_points = white_territory - self._captured_white + KOMI
+        else:
+            self.black_points = self.board.count_territory(Colors.black) - self._captured_black
+            self.white_points = self.board.count_territory(Colors.white) - self._captured_white + KOMI
+        return CountPointsResponse(self.black_points, self.white_points)
 
     def add_score_to_leaderboard(self):
         # TODO: Реализовать метод
@@ -121,18 +121,33 @@ class Game:
 class SingleplayerGame(Game):
     def __init__(self):
         super().__init__()
-        self.color_of_human = None
-        self.color_of_AI = None
-        self.AI: Optional[SmartAI | RandomAI] = None
+        self.color_of_human: Colors | None = None
+        self.color_of_AI: Colors | None = None
+        self.AI: SmartAI | RandomAI | None = None
 
-    def start_new_game(self, size, white_name: str, black_name: str, color_of_human: Colors = Colors.black):
-        logging.debug(
-            f"Начало одиночной игры с размером игрового поля: {size} и цветом игрока-человека {color_of_human}")
-
+    def start_singleplayer_game(self, size, human_name: str | None, color_of_human: Colors = Colors.black,
+                                AI_level: AILevel = AILevel.smart):
+        if not human_name:
+            logging.debug(f"Начало одиночной игры с размером игрового поля {size}, цветом {color_of_human} "
+                          f"игрока-человека без имени и уровнем ИИ {AI_level}")
+            black_name = 'Черные'
+            white_name = 'Белые'
+        else:
+            logging.debug(f"Начало одиночной игры с размером игрового поля {size}, цветом {color_of_human} "
+                          f"игрока-человека под именем {human_name} и уровнем ИИ {AI_level}")
+            if color_of_human == Colors.black:
+                black_name = human_name
+                white_name = 'Белые'
+            else:
+                black_name = 'Черные'
+                white_name = human_name
         self.color_of_human = color_of_human
         self.color_of_AI = color_of_human.get_opposite()
-        response = super().start_new_game(size, white_name, black_name)
-        self.AI = RandomAI(self.board)
+        response = super().start_new_game(size, black_name, white_name)
+        if AI_level == AILevel.smart:
+            self.AI = SmartAI(self.board)
+        else:
+            self.AI = RandomAI(self.board)
         return response
 
     def make_ai_move(self):
@@ -148,17 +163,11 @@ class SingleplayerGame(Game):
         logging.debug(f'Компьютер сходил в клетку {x}-{y}')
         return MakeMoveByAIResponse(x, y, self.color_of_current_move, captured)
 
-    # def pass_button_pressed(self, color: Colors) -> PassButtonResponse:
-    #     if color != self.color_of_human:
-    #         raise ValueError(f'Color of pressed pass button ({color}) and color of human ({self.color_of_human} must '
-    #                          f'be equal. ')
-    #     super().pass_button_pressed(color)
-
 
 class MultiplayerGame(Game):
     def __init__(self):
         super().__init__()
 
-    def start_new_game(self, size, white_name: str, black_name: str):
+    def start_multiplayer_game(self, size, black_name: str, white_name: str):
         logging.debug(f"Начало многопользовательской игры с размером игрового поля: {size}")
-        return super().start_new_game(size, white_name, black_name)
+        return super().start_new_game(size, black_name, white_name)

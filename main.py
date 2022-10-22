@@ -4,7 +4,7 @@ import os
 import json
 
 from game.display import start_gui
-from game.cli import start_cli
+from game.cli import CLI
 
 
 class Config:
@@ -31,15 +31,16 @@ if __name__ == '__main__':
         start_gui()
         exit(1)
 
-    print('Какую версию запустить?')
+    print('? Какую версию запустить?')
     print('[графическая — 0 (default); консольная — 1]')
     print('Ввод:', end=' ')
     interface = input()
     if interface == '0' or interface == '':
-        print('...Запуск графической версии...', end='\n\n')
+        print('i Запуск графической версии...', end='\n\n')
         start_gui()
     elif interface == '1':
-        print('...Запуск консольной версии...', end='\n\n')
-        start_cli()
+        print('i Запуск консольной версии...', end='\n\n')
+        cli = CLI()
+        cli.start_game()
     else:
         raise NameError(f'Неверный ввод. Получено: {interface}. Допустимо: 0, 1')

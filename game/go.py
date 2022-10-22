@@ -201,11 +201,6 @@ class FinalizedBoard(Board):
                              f'Доступный диапазон: [0, {self.size}).')
         return self.board[y][x]
 
-    def remove_cell_at(self, x, y):
-        adjusted_x = x + 1
-        adjusted_y = y + 1
-        self.board[adjusted_y][adjusted_x] = Cell(CellTypes.empty, CellStates.unmarked, adjusted_x, adjusted_y)
-
     def count_territory(self, color: Colors):
         # Using Flood fill algorithm
         for x in range(self.size_with_borders):
@@ -218,7 +213,7 @@ class FinalizedBoard(Board):
                     self.players_territory = [x for x in self.players_territory if x]
         territory_array = copy.deepcopy(sum(self.players_territory, []))
         self.restore_board()
-        return self.get_unique_cells(territory_array)
+        return len(self.get_unique_cells(territory_array))
 
     def flood_fill(self, color: Colors, x: int, y: int):
         if not self.met_opponent:

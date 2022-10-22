@@ -39,3 +39,21 @@ class PassButtonResponse:
     def __init__(self, current_turn: Colors, end_game: bool = False):
         self.current_turn = current_turn
         self.end_game = end_game
+
+
+class EndGameResponse:
+    def __init__(self, error_message=None):
+        self.error_message = error_message
+
+
+class RemoveCellsResponse:
+    def __init__(self, removed_cells: List[Cell] = None, error_message=None):
+        self.removed_cells = removed_cells
+        self.error_message = error_message
+
+
+class CountPointsResponse:
+    def __init__(self, black_points: int, white_points: int, is_written_to_leaderboard: bool = False):
+        self.black_points = black_points
+        self.white_points = white_points
+        self.is_written_to_leaderboard = is_written_to_leaderboard
