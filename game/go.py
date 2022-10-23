@@ -11,11 +11,16 @@ class Cell:
         self.x = x
         self.y = y
 
+        self.dead: bool = False
+
     def __str__(self):
         return str(self.type)
 
     def __eq__(self, other: Cell):
         return self.type == other.type and self.state == other.state and self.x == other.x and self.y == other.y
+
+    def check_dead(self):
+        self.dead = not self.dead
 
 
 def generate_empty_board(size):
