@@ -4,7 +4,7 @@ from PIL import ImageTk, Image
 
 from .consts import *
 from .element_creator import ElementCreator
-from ..enums import TypesOfGames
+from ..enums import TypesOfGames, AILevel, Colors
 
 
 class FrameStorage:
@@ -15,9 +15,11 @@ class FrameStorage:
 
         self.menu_frame = self._create_menu_frame()
         self.leaderboard_frame = self._create_menu_frame()
-        self.game_players_count_frame = self._create_menu_frame()
+        self.players_count_frame = self._create_menu_frame()
         self.game_size_frame = self._create_menu_frame()
         self.rule_frame = self._create_menu_frame()
+        self.ai_frame = self._create_menu_frame()
+        self.color_frame = self._create_menu_frame()
 
         self.game_frame = tk.Frame(window)
         self.escape_frame = self._create_menu_frame()
@@ -34,7 +36,8 @@ class FrameStorage:
         return menu_frame
 
     def configure_frames(self, element_creator: ElementCreator,
-                         on_leaderboard_open, on_chosen_player_count, on_chosen_field_size, exit_game_by_user):
+                         on_leaderboard_open, on_chosen_player_count, on_chosen_field_size, exit_game_by_user,
+                         on_chosen_ai, on_chosen_color):
 
         create_label = element_creator.create_label
         create_button = element_creator.create_button
@@ -42,7 +45,7 @@ class FrameStorage:
         # Main frame config
         create_label('Игра Го', self.menu_frame)
         create_button('Начать игру', self.menu_frame,
-                      callback=lambda: self.change_frame(self.menu_frame, self.game_players_count_frame))
+                      callback=lambda: self.change_frame(self.menu_frame, self.players_count_frame))
         create_button('Лидерборд', self.menu_frame,
                       callback=on_leaderboard_open)
         create_button('Правила игры', self.menu_frame,
@@ -50,13 +53,13 @@ class FrameStorage:
         create_button('Выход', self.menu_frame, callback=lambda: self._window.quit())
 
         # Frame with game type config
-        create_label('Выберете режим игры', self.game_players_count_frame, width=20)
-        create_button('С компьютером', self.game_players_count_frame,
+        create_label('Выберете режим игры', self.players_count_frame, width=20)
+        create_button('С компьютером', self.players_count_frame,
                       callback=lambda: on_chosen_player_count(TypesOfGames.singleplayer))
-        create_button('Два игрока', self.game_players_count_frame,
+        create_button('Два игрока', self.players_count_frame,
                       callback=lambda: on_chosen_player_count(TypesOfGames.multiplayer))
-        create_button('Назад', self.game_players_count_frame,
-                      callback=lambda: self.change_frame(self.game_players_count_frame, self.menu_frame))
+        create_button('Назад', self.players_count_frame,
+                      callback=lambda: self.change_frame(self.players_count_frame, self.menu_frame))
 
         # Frame with field size config
         create_label('Выберете размер игрового поля', self.game_size_frame, width=20)
@@ -64,7 +67,21 @@ class FrameStorage:
         create_button('13x13', self.game_size_frame, width=10, callback=lambda: on_chosen_field_size(13))
         create_button('19x19', self.game_size_frame, width=10, callback=lambda: on_chosen_field_size(19))
         create_button('Назад', self.game_size_frame, width=10,
-                      callback=lambda: self.change_frame(self.game_size_frame, self.game_players_count_frame))
+                      callback=lambda: self.change_frame(self.game_size_frame, self.players_count_frame))
+
+        # Frame with AI level config
+        create_label('Выберете уровень сложности', self.ai_frame, width=20)
+        create_button('Тупой', self.ai_frame, width=10, callback=lambda: on_chosen_ai(AILevel.random))
+        create_button('Умный', self.ai_frame, width=10, callback=lambda: on_chosen_ai(AILevel.smart))
+        create_button('Назад', self.ai_frame, width=10,
+                      callback=lambda: self.change_frame(self.ai_frame, self.color_frame))
+
+        # Frame with colors config
+        create_label('Выберете цвет', self.color_frame, width=20)
+        create_button('Белый', self.color_frame, width=10, callback=lambda: on_chosen_color(Colors.white))
+        create_button('Чёрный', self.color_frame, width=10, callback=lambda: on_chosen_color(Colors.black))
+        create_button('Назад', self.color_frame, width=10,
+                      callback=lambda: self.change_frame(self.color_frame, self.ai_frame))
 
         # Frame with rules config
         create_label('Правила игры', self.rule_frame, width=20)

@@ -1,7 +1,7 @@
 from typing import Optional, List
 import tkinter as tk
 
-from game.enums import TypesOfGames, Colors
+from game.enums import TypesOfGames, Colors, AILevel
 from game.game import SingleplayerGame, MultiplayerGame
 from .consts import *
 from .image_storage import ImageStorage
@@ -12,6 +12,9 @@ class GameSettings:
     def __init__(self):
         self.size: int = 9
         self._game_type: TypesOfGames = TypesOfGames.singleplayer
+        self.ai_level: AILevel = AILevel.random
+        self.singleplayer_color: Colors = Colors.black
+
         self.current_color: Colors = Colors.black
         self.game_api: Optional[SingleplayerGame | MultiplayerGame] = None
         self.info_label: Optional[tk.Label] = None
