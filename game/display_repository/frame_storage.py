@@ -74,7 +74,7 @@ class FrameStorage:
         create_button('Тупой', self.ai_frame, width=10, callback=lambda: on_chosen_ai(AILevel.random))
         create_button('Умный', self.ai_frame, width=10, callback=lambda: on_chosen_ai(AILevel.smart))
         create_button('Назад', self.ai_frame, width=10,
-                      callback=lambda: self.change_frame(self.ai_frame, self.color_frame))
+                      callback=lambda: self.change_frame(self.ai_frame, self.players_count_frame))
 
         # Frame with colors config
         create_label('Выберете цвет', self.color_frame, width=20)

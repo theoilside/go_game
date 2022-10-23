@@ -79,7 +79,7 @@ class GameSettings:
         if self.game_type == TypesOfGames.multiplayer:
             self._configure_label_multiplayer()
         else:
-            self._configure_label_singleplayer(self.current_color)
+            self._configure_label_singleplayer(self.singleplayer_color)
 
         self.info_label.grid(row=0, column=6, columnspan=self.size)
 

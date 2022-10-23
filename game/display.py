@@ -68,6 +68,8 @@ class Display:
         self.game_settings.configure_names(names_response.white_name, names_response.black_name)
 
         self.game_settings.current_color = start_response.current_turn
+        if self.game_settings.singleplayer_color == Colors.white:
+            self.do_ai_move()
         self.game_settings.configure_pass_buttons()
 
     def config_singleplayer(self) -> StartGameResponse:
@@ -95,7 +97,6 @@ class Display:
 
     def init_game_field(self):
         self.game_settings.init_game_state(self.frame_storage.game_frame, self.on_game_cell_pressed)
-
         return self.game_settings.field_cell
 
     def on_game_cell_pressed(self, row, column):
@@ -118,18 +119,21 @@ class Display:
         self.game_settings.update_info_label()
 
         if self.game_settings.game_type == TypesOfGames.singleplayer:
-            make_move_by_ai_response: MakeMoveByAIResponse = self.game_settings.game_api.make_ai_move()
-            self.clear_captured_pieces(make_move_by_ai_response.captured_pieces)
-            self.image_storage.change_ceil_image(self.game_settings.current_color.get_type_of_cells(),
-                                                 self.game_settings.field_cell[make_move_by_ai_response.y][
-                                                     make_move_by_ai_response.x])
-
-            self.game_settings.current_color = make_move_by_ai_response.current_turn
+            self.do_ai_move()
 
         current_score: GetCapturedCountResponse = self.game_settings.game_api.get_captured_pieces_count()
         self.game_settings.update_score(current_score.white_count, current_score.black_count)
 
         self.game_settings.configure_pass_buttons()
+
+    def do_ai_move(self):
+        make_move_by_ai_response: MakeMoveByAIResponse = self.game_settings.game_api.make_ai_move()
+        self.clear_captured_pieces(make_move_by_ai_response.captured_pieces)
+        self.image_storage.change_ceil_image(self.game_settings.current_color.get_type_of_cells(),
+                                             self.game_settings.field_cell[make_move_by_ai_response.y][
+                                                 make_move_by_ai_response.x])
+
+        self.game_settings.current_color = make_move_by_ai_response.current_turn
 
     def clear_captured_pieces(self, captured_pieces: List[Cell]):
         for captured_cell in captured_pieces:
