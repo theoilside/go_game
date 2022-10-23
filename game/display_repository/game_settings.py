@@ -24,6 +24,9 @@ class GameSettings:
         self.white_name: Optional[tk.Label] = None
         self.black_name: Optional[tk.Label] = None
 
+        self.white_pass: Optional[tk.Button] = None
+        self.black_pass: Optional[tk.Button]= None
+
         self._image_storage = ImageStorage()
 
     @property
@@ -105,7 +108,9 @@ class GameSettings:
         pass_button = tk.Button(game_frame, text='ПАС', font='Calibri 34 bold', bg='white',
                                 activebackground=BUTTON_PRESSED_COLOR, fg='black',
                                 highlightbackground='white',  # For Mac OS
-                                command=lambda: self.on_pass_button_pressed(Colors.white))
+                                command=lambda: self.on_pass_button_pressed())
+        self.white_pass = pass_button
+
         pass_button.grid(row=3, column=0, padx=20, rowspan=3)
 
     def _create_black_state(self, game_frame):
@@ -133,7 +138,8 @@ class GameSettings:
         pass_button = tk.Button(game_frame, text='ПАС', font='Calibri 34 bold', bg='black',
                                 activebackground=BUTTON_PRESSED_COLOR, fg='white',
                                 highlightbackground='black',  # For Mac OS
-                                command=lambda: self.on_pass_button_pressed(Colors.black))
+                                command=lambda: self.on_pass_button_pressed())
+        self.black_pass = pass_button
 
         pass_button.grid(row=3, column=self.size + 6, padx=20, rowspan=3)
 
@@ -141,12 +147,21 @@ class GameSettings:
         self.white_score.configure(text=f'Количество\nзахватов: {for_black}')
         self.black_score.configure(text=f'Количество\nзахватов: {for_white}')
 
-    def on_pass_button_pressed(self, color: Colors):
+    def on_pass_button_pressed(self):
         pass_button_response: PassButtonResponse = self.game_api.pass_button_pressed()
         self.current_color = pass_button_response.current_turn
         self.update_info_label()
+        self.configure_pass_buttons()
 
     def configure_names(self, white: str, black: str):
         self.white_name.configure(text=white)
         self.black_name.configure(text=black)
+
+    def configure_pass_buttons(self):
+        if self.current_color == Colors.black:
+            self.white_pass.configure(state=tk.DISABLED)
+            self.black_pass.configure(state=tk.NORMAL)
+        else:
+            self.white_pass.configure(state=tk.NORMAL)
+            self.black_pass.configure(state=tk.DISABLED)
 

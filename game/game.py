@@ -9,6 +9,7 @@ import logging
 KOMI = 6.5
 
 
+# TODO: Rewrite with decorator
 class Game:
     def __init__(self):
         self.board = None
@@ -119,24 +120,27 @@ class Game:
         # Добавляет результат метода get_score в бд лидерборда.
         ...
 
+    def get_player_names(self) -> GetPlayerNamesResponse:
+        return GetPlayerNamesResponse(self.white_name, self.black_name)
+
 
 class SingleplayerGame(Game):
     def __init__(self):
         super().__init__()
-        self.color_of_human: Colors | None = None
-        self.color_of_AI: Colors | None = None
-        self.AI = None
+        self.color_of_human: Optional[Colors] = None
+        self.color_of_AI: Optional[Colors] = None
+        self.AI: Optional[SmartAI | RandomAI] = None
 
     def start_singleplayer_game(self, size, human_name: str | None, color_of_human: Colors = Colors.black,
-                                AI_level: AILevel = AILevel.smart):
+                                ai_level: AILevel = AILevel.smart):
         if not human_name:
             logging.debug(f"Начало одиночной игры с размером игрового поля {size}, цветом {color_of_human} "
-                          f"игрока-человека без имени и уровнем ИИ {AI_level}")
+                          f"игрока-человека без имени и уровнем ИИ {ai_level}")
             black_name = 'Черные'
             white_name = 'Белые'
         else:
             logging.debug(f"Начало одиночной игры с размером игрового поля {size}, цветом {color_of_human} "
-                          f"игрока-человека под именем {human_name} и уровнем ИИ {AI_level}")
+                          f"игрока-человека под именем {human_name} и уровнем ИИ {ai_level}")
             if color_of_human == Colors.black:
                 black_name = human_name
                 white_name = 'Белые'
@@ -145,11 +149,15 @@ class SingleplayerGame(Game):
                 white_name = human_name
         self.color_of_human = color_of_human
         self.color_of_AI = color_of_human.get_opposite()
-        super().start_game(size, black_name, white_name)
-        if AI_level == AILevel.smart:
+
+        response = super().start_game(size, black_name, white_name)
+
+        if ai_level == AILevel.smart:
             self.AI = SmartAI(self.board)
         else:
             self.AI = RandomAI(self.board)
+
+        return response
 
     def make_ai_move(self):
         logging.debug('Ход компьютера:')
@@ -171,4 +179,4 @@ class MultiplayerGame(Game):
 
     def start_multiplayer_game(self, size: int, black_name: str | None = None, white_name: str | None = None):
         logging.debug(f"Начало многопользовательской игры с размером игрового поля: {size}")
-        super().start_game(size, black_name, white_name)
+        return super().start_game(size, black_name, white_name)

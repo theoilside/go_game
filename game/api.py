@@ -57,3 +57,9 @@ class CountPointsResponse:
         self.black_points = black_points
         self.white_points = white_points
         self.is_written_to_leaderboard = is_written_to_leaderboard
+
+
+class GetPlayerNamesResponse:
+    def __init__(self, white_name, black_name):
+        self.white_name = white_name
+        self.black_name = black_name

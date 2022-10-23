@@ -48,20 +48,27 @@ class Display:
         self.frame_storage.is_game_active = True
 
         if self.game_settings.game_type == TypesOfGames.singleplayer:
-            black_name = askstring('Имя', 'Как тебя зовут?')
-            black_name = 'Игрок' if black_name == '' else black_name
-            white_name = 'Компьютер'
+            start_response = self.config_singleplayer()
         else:
-            white_name = askstring('Белый', 'Как зовут белого игрока?')
-            black_name = askstring('Чёрный', 'Как зовут чёрного игрока?')
-            white_name = 'Белые' if white_name == '' else white_name
-            black_name = 'Чёрные' if black_name == '' else black_name
+            start_response = self.config_multiplayer()
 
-        self.game_settings.configure_names(white_name, black_name)
+        names_response = self.game_settings.game_api.get_player_names()
+        self.game_settings.configure_names(names_response.white_name, names_response.black_name)
 
-        start_game_response: StartGameResponse = self.game_settings.game_api.start_game(size, white_name,
-                                                                                        black_name)
-        self.game_settings.current_color = start_game_response.current_turn
+        self.game_settings.current_color = start_response.current_turn
+        self.game_settings.configure_pass_buttons()
+
+    def config_singleplayer(self) -> StartGameResponse:
+        name = askstring('Имя', 'Как тебя зовут?')
+        start_response = self.game_settings.game_api.start_singleplayer_game(self.game_settings.size, name)
+        return start_response
+
+    def config_multiplayer(self) -> StartGameResponse:
+        white_name = askstring('Белый', 'Как зовут белого игрока?')
+        black_name = askstring('Чёрный', 'Как зовут чёрного игрока?')
+        start_response = self.game_settings.game_api \
+            .start_multiplayer_game(self.game_settings.size, black_name, white_name)
+        return start_response
 
     def on_exit_game_by_user(self):
         old_frame = self.frame_storage.escape_frame
@@ -106,6 +113,8 @@ class Display:
 
         current_score: GetCapturedCountResponse = self.game_settings.game_api.get_captured_pieces_count()
         self.game_settings.update_score(current_score.white_count, current_score.black_count)
+
+        self.game_settings.configure_pass_buttons()
 
     def clear_captured_pieces(self, captured_pieces: List[Cell]):
         for captured_cell in captured_pieces:
