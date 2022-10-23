@@ -5,7 +5,7 @@ from .display_repository.element_creator import ElementCreator
 from .display_repository.game_settings import GameSettings
 from .display_repository.image_storage import ImageStorage
 from .api import *
-from .enums import CellTypes
+from .enums import CellTypes, AILevel
 from .go import TypesOfGames
 from .display_repository.consts import *
 from .display_repository.frame_storage import FrameStorage
@@ -28,7 +28,7 @@ class Display:
 
     def create_frames(self):
         self.frame_storage.configure_frames(self.element_creator, self.on_leaderboard_open, self.on_chosen_player_count,
-                                            self.on_chosen_field_size, self.on_exit_game_by_user)
+                                            self.on_chosen_field_size, self.on_exit_game_by_user, self.on_chosen_ai)
         self.frame_storage.menu_frame.pack()
 
     def on_leaderboard_open(self):
@@ -38,7 +38,14 @@ class Display:
 
     def on_chosen_player_count(self, game_type: TypesOfGames):
         self.game_settings.game_type = game_type
-        self.frame_storage.change_frame(self.frame_storage.game_players_count_frame, self.frame_storage.game_size_frame)
+        if game_type == TypesOfGames.singleplayer:
+            self.frame_storage.change_frame(self.frame_storage.players_count_frame, self.frame_storage.ai_frame)
+        else:
+            self.frame_storage.change_frame(self.frame_storage.players_count_frame, self.frame_storage.game_size_frame)
+
+    def on_chosen_ai(self, ai_level: AILevel):
+        self.game_settings.ai_level = ai_level
+        self.frame_storage.change_frame(self.frame_storage.ai_frame, self.frame_storage.game_size_frame)
 
     def on_chosen_field_size(self, size):
         self.game_settings.size = size
@@ -60,7 +67,8 @@ class Display:
 
     def config_singleplayer(self) -> StartGameResponse:
         name = askstring('Имя', 'Как тебя зовут?')
-        start_response = self.game_settings.game_api.start_singleplayer_game(self.game_settings.size, name)
+        start_response = self.game_settings.game_api.start_singleplayer_game(self.game_settings.size, name,
+                                                                             ai_level=self.game_settings.ai_level)
         return start_response
 
     def config_multiplayer(self) -> StartGameResponse:
