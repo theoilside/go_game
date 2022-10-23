@@ -101,11 +101,11 @@ class Game:
             self.board.update_cell(cell, CellTypes.empty, CellStates.unmarked)
         return RemoveCellsResponse(removed_cells)
 
-    def finalize_board(self):
+    def finalize_board(self) -> FinalizedBoardResponse:
         self.board = FinalizedBoard(self.board)
-        return EndGameResponse()
+        return FinalizedBoardResponse()
 
-    def count_points(self, black_territory: int = None, white_territory: int = None):
+    def count_points(self, black_territory: int = None, white_territory: int = None) -> CountPointsResponse:
         # Необязательные аргументы: заранее введенные площади черных/белых.
         if black_territory and white_territory:
             self.black_points = black_territory - self._captured_black

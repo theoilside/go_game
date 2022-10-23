@@ -41,7 +41,7 @@ class PassButtonResponse:
         self.end_game = end_game
 
 
-class EndGameResponse:
+class FinalizedBoardResponse:
     def __init__(self, error_message=None):
         self.error_message = error_message
 
