@@ -13,6 +13,8 @@ class GameSettings:
         self.size: int = 9
         self._game_type: TypesOfGames = TypesOfGames.singleplayer
         self.ai_level: AILevel = AILevel.random
+        self.singleplayer_color: Colors = Colors.black
+
         self.current_color: Colors = Colors.black
         self.game_api: Optional[SingleplayerGame | MultiplayerGame] = None
         self.info_label: Optional[tk.Label] = None

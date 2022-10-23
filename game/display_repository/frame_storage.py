@@ -4,7 +4,7 @@ from PIL import ImageTk, Image
 
 from .consts import *
 from .element_creator import ElementCreator
-from ..enums import TypesOfGames, AILevel
+from ..enums import TypesOfGames, AILevel, Colors
 
 
 class FrameStorage:
@@ -19,6 +19,7 @@ class FrameStorage:
         self.game_size_frame = self._create_menu_frame()
         self.rule_frame = self._create_menu_frame()
         self.ai_frame = self._create_menu_frame()
+        self.color_frame = self._create_menu_frame()
 
         self.game_frame = tk.Frame(window)
         self.escape_frame = self._create_menu_frame()
@@ -36,7 +37,7 @@ class FrameStorage:
 
     def configure_frames(self, element_creator: ElementCreator,
                          on_leaderboard_open, on_chosen_player_count, on_chosen_field_size, exit_game_by_user,
-                         on_chosen_ai):
+                         on_chosen_ai, on_chosen_color):
 
         create_label = element_creator.create_label
         create_button = element_creator.create_button
@@ -73,7 +74,14 @@ class FrameStorage:
         create_button('Тупой', self.ai_frame, width=10, callback=lambda: on_chosen_ai(AILevel.random))
         create_button('Умный', self.ai_frame, width=10, callback=lambda: on_chosen_ai(AILevel.smart))
         create_button('Назад', self.ai_frame, width=10,
-                      callback=lambda: self.change_frame(self.ai_frame, self.players_count_frame))
+                      callback=lambda: self.change_frame(self.ai_frame, self.color_frame))
+
+        # Frame with colors config
+        create_label('Выберете цвет', self.color_frame, width=20)
+        create_button('Белый', self.color_frame, width=10, callback=lambda: on_chosen_color(Colors.white))
+        create_button('Чёрный', self.color_frame, width=10, callback=lambda: on_chosen_color(Colors.black))
+        create_button('Назад', self.color_frame, width=10,
+                      callback=lambda: self.change_frame(self.color_frame, self.ai_frame))
 
         # Frame with rules config
         create_label('Правила игры', self.rule_frame, width=20)
