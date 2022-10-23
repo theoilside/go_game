@@ -24,6 +24,9 @@ class Display:
         window.title('Игра "Го"')
         window.iconbitmap(ICON_PATH)
 
+        self.is_choose_dead_cells: bool = False
+        self.dead_cells = []
+
         self.create_frames()
 
     def create_frames(self):
@@ -70,7 +73,7 @@ class Display:
         self.game_settings.current_color = start_response.current_turn
         if self.game_settings.singleplayer_color == Colors.white:
             self.game_settings.do_ai_move()
-        self.game_settings.configure_pass_buttons()
+        self.game_settings.change_pass_buttons()
 
     def config_singleplayer(self) -> StartGameResponse:
         name = askstring('Имя', 'Как тебя зовут?')
@@ -96,10 +99,16 @@ class Display:
         self.frame_storage.is_game_active = False
 
     def init_game_field(self):
-        self.game_settings.init_game_state(self.frame_storage.game_frame, self.on_game_cell_pressed)
+        self.game_settings.init_game_state(self.frame_storage.game_frame, self.on_game_cell_pressed,
+                                           self.on_pass_button_pressed, self.on_confirm_button)
         return self.game_settings.field_cell
 
     def on_game_cell_pressed(self, row, column):
+        if self.is_choose_dead_cells:
+            cell_type_response = self.game_settings.game_api.put_dead_cell(column, row)
+            self.image_storage.highlight_cell(self.game_settings.field_cell[row][column],
+                                              cell_type_response.cell_type, cell_type_response.highlighted)
+            return
         # TODO: Вынести обработку нажатой клетки в отдельный модуль
         make_move_player_response: MakeMoveByPlayerResponse = \
             self.game_settings.game_api.make_player_move(x=column, y=row)
@@ -113,7 +122,7 @@ class Display:
         # Убрать с поля все захваченные фигуры
         self.game_settings.clear_captured_pieces(make_move_player_response.captured_pieces)
 
-        self.image_storage.change_ceil_image(
+        self.image_storage.change_cell_image(
             self.game_settings.current_color.get_type_of_cells(), self.game_settings.field_cell[row][column])
         self.game_settings.current_color = make_move_player_response.current_color
         self.game_settings.update_info_label()
@@ -124,7 +133,31 @@ class Display:
         current_score: GetCapturedCountResponse = self.game_settings.game_api.get_captured_pieces_count()
         self.game_settings.update_score(current_score.white_count, current_score.black_count)
 
-        self.game_settings.configure_pass_buttons()
+        self.game_settings.change_pass_buttons()
+
+    def on_pass_button_pressed(self):
+        pass_button_response: PassButtonResponse = self.game_settings.game_api \
+            .pass_button_pressed(self.game_settings.game_type == TypesOfGames.singleplayer)
+
+        if pass_button_response.end_game:
+            self.game_settings.info_label.configure(text='Игра окончена!')
+            self.game_settings.error_label.configure(text='Выберете мёртвые камни')
+            self.game_settings.disable_pass_button()
+
+            self.game_settings.grid_confirm_button()
+            self.is_choose_dead_cells = True
+
+        self.game_settings.current_color = pass_button_response.current_turn
+        if self.game_settings.game_type == TypesOfGames.singleplayer:
+            self.game_settings.do_ai_move()
+        self.game_settings.update_info_label()
+        self.game_settings.change_pass_buttons()
+
+    def on_confirm_button(self):
+        cell_to_delete = self.game_settings.game_api.remove_pieces_at_coords().removed_cells
+        for cell in cell_to_delete:
+            self.image_storage.change_cell_image(CellTypes.empty, self.game_settings.field_cell[cell.y-1][cell.x-1])
+
 
 
 def start_gui():

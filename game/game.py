@@ -22,6 +22,8 @@ class Game:
         self.black_points = 0
         self.white_points = 0
 
+        self._dead_cells = []
+
     def start_game(self, size: int, black_name: str | None, white_name: str | None) -> StartGameResponse:
         self.board = Board(size)
         if black_name:
@@ -60,6 +62,12 @@ class Game:
     def get_captured_pieces_count(self) -> GetCapturedCountResponse:
         return GetCapturedCountResponse(self._captured_white, self._captured_black)
 
+    def put_dead_cell(self, x, y):
+        cell: Cell = self.board.get_cell(x+1, y+1)
+        if cell.type == CellTypes.white or cell.type == CellTypes.black:
+            cell.check_dead()
+        return GetTypeOfCell(cell.type, not cell.dead)
+
     @staticmethod
     def get_leaderboard() -> GetLeaderboardResponse:
         db_api = DatabaseAPI()
@@ -90,15 +98,13 @@ class Game:
             else:
                 self._captured_black += int(amount_of_captured)
 
-    def remove_pieces_at_coords(self, list_of_coords: List[Tuple[int, int]]):
-        # Аргумент: список координат в формате Tuple, по которому нужно убрать с доски.
+    def remove_pieces_at_coords(self):
         removed_cells = []
-        for coord in list_of_coords:
-            adjusted_x = coord[0] + 1
-            adjusted_y = coord[1] + 1
-            cell = self.board.get_cell(adjusted_x, adjusted_y)
-            removed_cells.append(cell)
-            self.board.update_cell(cell, CellTypes.empty, CellStates.unmarked)
+        for _ in self.board.board:
+            for cell in _:
+                if cell.dead:
+                    removed_cells.append(cell)
+                    self.board.update_cell(cell, CellTypes.empty, CellStates.unmarked)
         return RemoveCellsResponse(removed_cells)
 
     def finalize_board(self):

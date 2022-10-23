@@ -9,6 +9,9 @@ BLACK_COLOR = '#000000'
 EMPTY_CELL_PATH = './img/empty.png'
 BLACK_CELL_PATH = './img/black.png'
 WHITE_CELL_PATH = './img/white.png'
+WHITE_RED_CELL_PATH = './img/white-red.png'
+BLACK_RED_CELL_PATH = './img/black-red.png'
+
 ICON_PATH = './img/icon.ico'
 
 CALIBRI_LARGE_FONT = 'Calibri 34'

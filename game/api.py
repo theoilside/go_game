@@ -1,5 +1,5 @@
 from typing import Optional, List, Tuple
-from game.enums import Colors
+from game.enums import Colors, CellTypes
 from game.go import Cell
 
 
@@ -63,3 +63,9 @@ class GetPlayerNamesResponse:
     def __init__(self, white_name, black_name):
         self.white_name = white_name
         self.black_name = black_name
+
+
+class GetTypeOfCell:
+    def __init__(self, cell_type: CellTypes, highlighted: bool):
+        self.highlighted = highlighted
+        self.cell_type = cell_type
