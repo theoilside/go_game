@@ -5,7 +5,7 @@ from .display_repository.element_creator import ElementCreator
 from .display_repository.game_settings import GameSettings
 from .display_repository.image_storage import ImageStorage
 from .api import *
-from .enums import CellTypes, AILevel
+from .enums import AILevel
 from .go import TypesOfGames
 from .display_repository.consts import *
 from .display_repository.frame_storage import FrameStorage
@@ -69,7 +69,7 @@ class Display:
 
         self.game_settings.current_color = start_response.current_turn
         if self.game_settings.singleplayer_color == Colors.white:
-            self.do_ai_move()
+            self.game_settings.do_ai_move()
         self.game_settings.configure_pass_buttons()
 
     def config_singleplayer(self) -> StartGameResponse:
@@ -111,7 +111,7 @@ class Display:
         self.game_settings.update_error_label(is_error=False)
 
         # Убрать с поля все захваченные фигуры
-        self.clear_captured_pieces(make_move_player_response.captured_pieces)
+        self.game_settings.clear_captured_pieces(make_move_player_response.captured_pieces)
 
         self.image_storage.change_ceil_image(
             self.game_settings.current_color.get_type_of_cells(), self.game_settings.field_cell[row][column])
@@ -119,27 +119,12 @@ class Display:
         self.game_settings.update_info_label()
 
         if self.game_settings.game_type == TypesOfGames.singleplayer:
-            self.do_ai_move()
+            self.game_settings.do_ai_move()
 
         current_score: GetCapturedCountResponse = self.game_settings.game_api.get_captured_pieces_count()
         self.game_settings.update_score(current_score.white_count, current_score.black_count)
 
         self.game_settings.configure_pass_buttons()
-
-    def do_ai_move(self):
-        make_move_by_ai_response: MakeMoveByAIResponse = self.game_settings.game_api.make_ai_move()
-        self.clear_captured_pieces(make_move_by_ai_response.captured_pieces)
-        self.image_storage.change_ceil_image(self.game_settings.current_color.get_type_of_cells(),
-                                             self.game_settings.field_cell[make_move_by_ai_response.y][
-                                                 make_move_by_ai_response.x])
-
-        self.game_settings.current_color = make_move_by_ai_response.current_turn
-
-    def clear_captured_pieces(self, captured_pieces: List[Cell]):
-        for captured_cell in captured_pieces:
-            self.image_storage.change_ceil_image(CellTypes.empty,
-                                                 self.game_settings.field_cell[captured_cell.y - 1][
-                                                     captured_cell.x - 1])
 
 
 def start_gui():

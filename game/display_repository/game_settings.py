@@ -1,11 +1,12 @@
 from typing import Optional, List
 import tkinter as tk
 
-from game.enums import TypesOfGames, Colors, AILevel
+from game.enums import TypesOfGames, Colors, AILevel, CellTypes
 from game.game import SingleplayerGame, MultiplayerGame
 from .consts import *
 from .image_storage import ImageStorage
-from ..api import PassButtonResponse
+from ..api import PassButtonResponse, MakeMoveByAIResponse
+from ..go import Cell
 
 
 class GameSettings:
@@ -28,7 +29,7 @@ class GameSettings:
         self.black_name: Optional[tk.Label] = None
 
         self.white_pass: Optional[tk.Button] = None
-        self.black_pass: Optional[tk.Button]= None
+        self.black_pass: Optional[tk.Button] = None
 
         self._image_storage = ImageStorage()
 
@@ -151,9 +152,11 @@ class GameSettings:
         self.black_score.configure(text=f'Количество\nзахватов: {for_white}')
 
     def on_pass_button_pressed(self):
-        pass_button_response: PassButtonResponse = self.game_api\
+        pass_button_response: PassButtonResponse = self.game_api \
             .pass_button_pressed(self.game_type == TypesOfGames.singleplayer)
         self.current_color = pass_button_response.current_turn
+        if self.game_type == TypesOfGames.singleplayer:
+            self.do_ai_move()
         self.update_info_label()
         self.configure_pass_buttons()
 
@@ -169,3 +172,17 @@ class GameSettings:
             self.white_pass.configure(state=tk.NORMAL)
             self.black_pass.configure(state=tk.DISABLED)
 
+    def do_ai_move(self):
+        make_move_by_ai_response: MakeMoveByAIResponse = self.game_api.make_ai_move()
+        self.clear_captured_pieces(make_move_by_ai_response.captured_pieces)
+        self._image_storage.change_ceil_image(self.current_color.get_type_of_cells(),
+                                              self.field_cell[make_move_by_ai_response.y][
+                                                  make_move_by_ai_response.x])
+
+        self.current_color = make_move_by_ai_response.current_turn
+
+    def clear_captured_pieces(self, captured_pieces: List[Cell]):
+        for captured_cell in captured_pieces:
+            self._image_storage.change_ceil_image(CellTypes.empty,
+                                                  self.field_cell[captured_cell.y - 1][
+                                                      captured_cell.x - 1])
