@@ -55,7 +55,6 @@ class Game:
             self.finalize_board()
             return PassButtonResponse(self.color_of_current_move, True)
         self.is_passed_last_turn = True
-        self.color_of_current_move = self.color_of_current_move.get_opposite()
         return PassButtonResponse(self.color_of_current_move)
 
     def get_captured_pieces_count(self) -> GetCapturedCountResponse:
