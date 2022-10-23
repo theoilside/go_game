@@ -49,6 +49,7 @@ class Game:
         return MakeMoveByPlayerResponse(False, self.color_of_current_move, 'Cannot make move!')
 
     def pass_button_pressed(self, pass_by_only_human: bool = False) -> PassButtonResponse:
+        self.color_of_current_move = self.color_of_current_move.get_opposite()
         # Вызывается, когда пользователь нажал кнопку ПАС
         if self.is_passed_last_turn or pass_by_only_human:
             self.finalize_board()
