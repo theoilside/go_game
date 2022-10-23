@@ -21,10 +21,12 @@ class Game:
         self.black_points = 0
         self.white_points = 0
 
-    def start_new_game(self, size: int, black_name: str, white_name: str):
+    def start_game(self, size: int, black_name: str | None, white_name: str | None) -> StartGameResponse:
         self.board = Board(size)
-        self.black_name = black_name
-        self.white_name = white_name
+        if black_name:
+            self.black_name = black_name
+        if white_name:
+            self.white_name = white_name
         return StartGameResponse(Colors.black)
 
     def make_player_move(self, x, y):
@@ -123,7 +125,7 @@ class SingleplayerGame(Game):
         super().__init__()
         self.color_of_human: Colors | None = None
         self.color_of_AI: Colors | None = None
-        self.AI: SmartAI | RandomAI | None = None
+        self.AI = None
 
     def start_singleplayer_game(self, size, human_name: str | None, color_of_human: Colors = Colors.black,
                                 AI_level: AILevel = AILevel.smart):
@@ -143,12 +145,11 @@ class SingleplayerGame(Game):
                 white_name = human_name
         self.color_of_human = color_of_human
         self.color_of_AI = color_of_human.get_opposite()
-        response = super().start_new_game(size, black_name, white_name)
+        super().start_game(size, black_name, white_name)
         if AI_level == AILevel.smart:
             self.AI = SmartAI(self.board)
         else:
             self.AI = RandomAI(self.board)
-        return response
 
     def make_ai_move(self):
         logging.debug('Ход компьютера:')
@@ -168,6 +169,6 @@ class MultiplayerGame(Game):
     def __init__(self):
         super().__init__()
 
-    def start_multiplayer_game(self, size, black_name: str, white_name: str):
+    def start_multiplayer_game(self, size: int, black_name: str | None = None, white_name: str | None = None):
         logging.debug(f"Начало многопользовательской игры с размером игрового поля: {size}")
-        return super().start_new_game(size, black_name, white_name)
+        super().start_game(size, black_name, white_name)

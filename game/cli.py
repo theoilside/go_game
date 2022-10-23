@@ -1,33 +1,13 @@
-from .game import Game, SingleplayerGame, MultiplayerGame
+from .game import SingleplayerGame, MultiplayerGame
 from .enums import Colors, AILevel
 import re
 
 
 class CLI:
     def __init__(self):
-        self.game: SingleplayerGame | MultiplayerGame | None = None
+        self.game = None
         self.board_size: int = 9
         self.completed_game: bool = False
-
-    def start_game(self):
-        self.ask_for_game_mode()
-        self.ask_for_size()
-        if self.game == SingleplayerGame:
-            SingleplayerCLI().start_singleplayer()
-        else:
-            MultiplayerCLI().start_multiplayer()
-
-    def ask_for_game_mode(self):
-        print('? Выберите режим игры.')
-        print('[одиночная  — 0 (default); мультиплеерная — 1]')
-        print('Ввод:', end=' ')
-        interface = input()
-        if interface == '0' or not interface:
-            self.game = SingleplayerGame()
-        elif interface == '1':
-            self.game = MultiplayerGame()
-        else:
-            raise NameError(f'Неверный ввод. Получено: {interface}. Допустимо: 0, 1')
 
     def ask_for_size(self):
         print('? Выберите размер игрового поля. Минимальный размер: 5х5; максимальный: 19х19.')
@@ -46,6 +26,7 @@ class CLI:
     def end_game(self):
         self.game.finalize_board()
         self.ask_for_count()
+        self.count_points()
 
     def ask_for_count(self):
         print('? Выберите полуавтоматический или самостоятельный подсчет территорий.')
@@ -108,10 +89,12 @@ class SingleplayerCLI(CLI):
         self.player_can_move: bool = True
 
     def start_singleplayer(self):
+        self.game = SingleplayerGame()
+        self.ask_for_size()
         self._ask_for_human_color()
         self._ask_for_human_name()
         self._ask_for_AI_level()
-        super().game.start_singleplayer_game(self.board_size, self.human_name, self.human_color, self.AI_level)
+        self.game.start_singleplayer_game(self.board_size, self.human_name, self.human_color, self.AI_level)
         while not self.completed_game:
             self._ask_for_human_turn()
             if not self.completed_game:
@@ -198,6 +181,7 @@ class MultiplayerCLI(CLI):
         self.white_name: str | None = None
 
     def start_multiplayer(self):
+        self.game = MultiplayerGame()
         self._ask_for_black_name()
         self._ask_for_white_name()
         self.game.start_multiplayer_game(self.board_size, self.black_name, self.white_name)
@@ -259,3 +243,18 @@ class MultiplayerCLI(CLI):
                 self.white_name = str(interface)
             except TypeError:
                 raise NameError(f'Неверный ввод. Получено: {interface}. Допустима строка из стандартных символов.')
+
+
+def start_cli():
+    print('? Выберите режим игры.')
+    print('[одиночная  — 0 (default); мультиплеерная — 1]')
+    print('Ввод:', end=' ')
+    interface = input()
+    if interface == '0' or not interface:
+        cli = SingleplayerCLI()
+        cli.start_singleplayer()
+    elif interface == '1':
+        cli = MultiplayerCLI()
+        cli.start_multiplayer()
+    else:
+        raise NameError(f'Неверный ввод. Получено: {interface}. Допустимо: 0, 1')

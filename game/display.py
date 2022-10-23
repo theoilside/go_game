@@ -59,8 +59,8 @@ class Display:
 
         self.game_settings.configure_names(white_name, black_name)
 
-        start_game_response: StartGameResponse = self.game_settings.game_api.start_new_game(size, white_name,
-                                                                                            black_name)
+        start_game_response: StartGameResponse = self.game_settings.game_api.start_game(size, white_name,
+                                                                                        black_name)
         self.game_settings.current_color = start_game_response.current_turn
 
     def on_exit_game_by_user(self):
