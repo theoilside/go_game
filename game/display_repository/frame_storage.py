@@ -71,9 +71,9 @@ class FrameStorage:
 
         # Frame with AI level config
         create_label('Выберите уровень сложности', self.ai_frame, width=20)
-        create_button('Простой', self.ai_frame, width=10, callback=lambda: on_chosen_ai(AILevel.easy))
-        create_button('Нормальный', self.ai_frame, width=10, callback=lambda: on_chosen_ai(AILevel.normal))
-        create_button('Сложный', self.ai_frame, width=10, callback=lambda: on_chosen_ai(AILevel.hard))
+        create_button('Простой', self.ai_frame, width=15, callback=lambda: on_chosen_ai(AILevel.easy))
+        create_button('Нормальный', self.ai_frame, width=15, callback=lambda: on_chosen_ai(AILevel.normal))
+        create_button('Сложный', self.ai_frame, width=15, callback=lambda: on_chosen_ai(AILevel.hard))
         create_button('← Назад', self.ai_frame, width=10,
                       callback=lambda: self.change_frame(self.ai_frame, self.players_count_frame))
 
