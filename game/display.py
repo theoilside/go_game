@@ -4,7 +4,7 @@ from tkinter.simpledialog import askstring
 from .display_repository.element_creator import ElementCreator
 from .display_repository.game_settings import GameSettings
 from .display_repository.image_storage import ImageStorage
-from .api import *
+from .api_responses import *
 from .enums import AILevel
 from .go import TypesOfGames
 from .display_repository.consts import *
@@ -156,8 +156,7 @@ class Display:
     def on_confirm_button(self):
         cell_to_delete = self.game_settings.game_api.remove_pieces_at_coords().removed_cells
         for cell in cell_to_delete:
-            self.image_storage.change_cell_image(CellTypes.empty, self.game_settings.field_cell[cell.y-1][cell.x-1])
-
+            self.image_storage.change_cell_image(CellTypes.empty, self.game_settings.field_cell[cell.y - 1][cell.x - 1])
 
 
 def start_gui():

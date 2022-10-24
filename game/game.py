@@ -1,5 +1,5 @@
 from collections import namedtuple
-from .api import *
+from .api_responses import *
 from .enums import Colors, CellStates, CellTypes, AILevel
 from .go import Board, FinalizedBoard
 from .ai import EasyAI, NormalAI, HardAI
@@ -86,11 +86,11 @@ class Game:
         return FinalizedBoardResponse()
 
     def mark_dead_cell(self, x, y) -> MarkDeadResponse:
-        cell = self.board.get_cell(x + 1, y + 1)
-        self.board.mark_cell_as_dead(cell)
-        return MarkDeadResponse(cell.type, not cell.state == CellStates.dead)
+        cell = self.board.mark_cell(x + 1, y + 1)
+        return MarkDeadResponse(cell.type, cell.state != CellStates.marked)
 
     def remove_pieces_at_coords(self) -> RemoveCellsResponse:
+        self.board.mark_dead_cells()
         for cell in self.board.dead_cells:
             self.board.update_cell(cell, CellTypes.empty, CellStates.unmarked)
         return RemoveCellsResponse(self.board.dead_cells)

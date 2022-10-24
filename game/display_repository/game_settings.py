@@ -5,7 +5,7 @@ from game.enums import TypesOfGames, Colors, AILevel, CellTypes
 from game.game import SingleplayerGame, MultiplayerGame
 from .consts import *
 from .image_storage import ImageStorage
-from ..api import MakeMoveByAIResponse
+from ..api_responses import MakeMoveByAIResponse
 from ..go import Cell
 
 

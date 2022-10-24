@@ -62,7 +62,7 @@ class CellStates(Enum):
     dead = 'd'
 
     def get_opposite(self):
-        if self.value == 'unmarked':
+        if self == CellStates.unmarked:
             return CellStates.marked
         return CellStates.unmarked
 

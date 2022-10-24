@@ -87,7 +87,9 @@ class Board:
             new_type = cell.type
         if not new_state:
             new_state = cell.state
-        self.board[cell.y][cell.x] = Cell(new_type, new_state, cell.x, cell.y)
+        new_cell = Cell(new_type, new_state, cell.x, cell.y)
+        self.board[cell.y][cell.x] = new_cell
+        return new_cell
 
     def replace_board(self, new_board: Board):
         self.size = new_board.size
@@ -215,10 +217,19 @@ class FinalizedBoard(Board):
                              f'Доступный диапазон: [0, {self.size}).')
         return self.board[y][x]
 
-    def mark_cell_as_dead(self, cell: Cell):
+    def mark_cell(self, x, y):
+        cell = self.get_cell(x, y)
         if cell.type == CellTypes.white or cell.type == CellTypes.black:
-            self.update_cell(cell, None, CellStates.dead)
+            cell = self.update_cell(cell, None, cell.state.get_opposite())
             self.dead_cells.append(cell)
+        return cell
+
+    def mark_dead_cells(self):
+        for _ in self.board:
+            for dead_cell in _:
+                if dead_cell.state == CellStates.marked:
+                    dead_cell.state = CellStates.dead
+                    self.dead_cells.append(dead_cell)
 
     def count_territory(self, color: Colors):
         # Using Flood fill algorithm
