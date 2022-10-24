@@ -21,7 +21,7 @@ class Display:
         self.element_creator = ElementCreator()
 
         window.geometry(f'{WIDTH}x{HEIGHT}')
-        window.title('Игра "Го"')
+        window.title('Игра «Го»')
         window.iconbitmap(ICON_PATH)
 
         self.is_choose_dead_cells: bool = False
@@ -76,7 +76,7 @@ class Display:
         self.game_settings.change_pass_buttons()
 
     def config_singleplayer(self) -> StartGameResponse:
-        name = askstring('Имя', 'Как тебя зовут?')
+        name = askstring('Имя', 'Введите ваше имя.\nПоле можно оставить пустым')
         start_response = self.game_settings.game_api \
             .start_singleplayer_game(self.game_settings.size, name,
                                      ai_level=self.game_settings.ai_level,
@@ -84,8 +84,8 @@ class Display:
         return start_response
 
     def config_multiplayer(self) -> StartGameResponse:
-        white_name = askstring('Белый', 'Как зовут белого игрока?')
-        black_name = askstring('Чёрный', 'Как зовут чёрного игрока?')
+        black_name = askstring('Имя черных', 'Введите имя черного игрока.\nПоле можно оставить пустым')
+        white_name = askstring('Имя белых', 'Введите имя белого игрока.\nПоле можно оставить пустым')
         start_response = self.game_settings.game_api \
             .start_multiplayer_game(self.game_settings.size, black_name, white_name)
         return start_response
@@ -105,13 +105,13 @@ class Display:
 
     def on_game_cell_pressed(self, row, column):
         if self.is_choose_dead_cells:
-            cell_type_response = self.game_settings.game_api.put_dead_cell(column, row)
+            cell_type_response = self.game_settings.game_api.mark_dead_cell(column, row)
             self.image_storage.highlight_cell(self.game_settings.field_cell[row][column],
                                               cell_type_response.cell_type, cell_type_response.highlighted)
             return
         # TODO: Вынести обработку нажатой клетки в отдельный модуль
         make_move_player_response: MakeMoveByPlayerResponse = \
-            self.game_settings.game_api.make_player_move(x=column, y=row)
+            self.game_settings.game_api.request_move(x=column, y=row)
 
         # Если ход сделать нельзя, вывести ошибку
         if not make_move_player_response.is_success:
@@ -141,7 +141,7 @@ class Display:
 
         if pass_button_response.end_game:
             self.game_settings.info_label.configure(text='Игра окончена!')
-            self.game_settings.error_label.configure(text='Выберете мёртвые камни')
+            self.game_settings.error_label.configure(text='Выберите мертвые камни')
             self.game_settings.disable_pass_button()
 
             self.game_settings.grid_confirm_button()

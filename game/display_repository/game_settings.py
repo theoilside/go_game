@@ -13,7 +13,7 @@ class GameSettings:
     def __init__(self):
         self.size: int = 9
         self._game_type: TypesOfGames = TypesOfGames.singleplayer
-        self.ai_level: AILevel = AILevel.random
+        self.ai_level: AILevel = AILevel.hard
         self.singleplayer_color: Colors = Colors.black
 
         self.current_color: Colors = Colors.black
@@ -46,17 +46,17 @@ class GameSettings:
 
     def _configure_label_multiplayer(self):
         self.info_label.configure(
-            text=f'Сейчас ходит {"белый" if self.current_color == Colors.white else "чёрный"} игрок')
+            text=f'Сейчас ходит {"белый" if self.current_color == Colors.white else "черный"} игрок')
 
     def _configure_label_singleplayer(self, color_of_player: Colors):
-        self.info_label.configure(text=f'Вы играете за {"белыx" if color_of_player == Colors.white else "чёрныx"}')
+        self.info_label.configure(text=f'Вы играете за {"белыx" if color_of_player == Colors.white else "черныx"}')
 
     def update_info_label(self):
         if self._game_type == TypesOfGames.multiplayer:
             self._configure_label_multiplayer()
 
     def update_error_label(self, is_error: bool):
-        self.error_label.configure(text='Такой ход сделать нельзя' if is_error else '')
+        self.error_label.configure(text='Такой ход сделать нельзя!' if is_error else '')
 
     def init_game_state(self, game_frame, on_cell_pressed, on_pass_button_pressed, on_confirm_button):
         for x in range(self.size):
@@ -74,8 +74,8 @@ class GameSettings:
                 game_row_ceil.append(btn)
             self.field_cell.append(game_row_ceil)
 
-        self._create_white_state(game_frame, on_pass_button_pressed)
         self._create_black_state(game_frame, on_pass_button_pressed)
+        self._create_white_state(game_frame, on_pass_button_pressed)
         self.update_score(0, 0)
 
         self.info_label = tk.Label(game_frame, font='Calibri 20')
@@ -97,7 +97,7 @@ class GameSettings:
 
     def _create_white_state(self, game_frame, on_pass_button_pressed):
         name = tk.Label(game_frame,
-                        text='Белый',
+                        text='Белые',
                         background='white',
                         font='Calibri 34',
                         fg='black',
@@ -127,7 +127,7 @@ class GameSettings:
 
     def _create_black_state(self, game_frame, on_pass_button_pressed):
         name = tk.Label(game_frame,
-                        text='Чёрный',
+                        text='Черные',
                         background='black',
                         font='Calibri 34',
                         fg='white',
@@ -156,8 +156,8 @@ class GameSettings:
         pass_button.grid(row=3, column=self.size + 6, padx=20, rowspan=3)
 
     def update_score(self, for_white: int, for_black: int):
-        self.white_score.configure(text=f'Количество\nзахватов: {for_black}')
-        self.black_score.configure(text=f'Количество\nзахватов: {for_white}')
+        self.white_score.configure(text=f'Захвачено:\n{for_black}')
+        self.black_score.configure(text=f'Захвачено:\n{for_white}')
 
     def configure_names(self, white: str, black: str):
         self.white_name.configure(text=white)

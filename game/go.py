@@ -11,16 +11,11 @@ class Cell:
         self.x = x
         self.y = y
 
-        self.dead: bool = False
-
     def __str__(self):
         return str(self.type)
 
     def __eq__(self, other: Cell):
         return self.type == other.type and self.state == other.state and self.x == other.x and self.y == other.y
-
-    def check_dead(self):
-        self.dead = not self.dead
 
 
 def generate_empty_board(size):
@@ -150,8 +145,22 @@ class Board:
                     self.compute_board_updates(color, x, y)
                     if len(self.current_liberties) == 0:
                         captured.append(self.get_current_captured_group())
+                    self.current_liberties.clear()
                     self.restore_states()
         return captured
+
+    def get_liberties(self, color: Colors):
+        liberties = []
+        for x in range(self.size_with_borders):
+            for y in range(self.size_with_borders):
+                cell = self.get_cell(x, y)
+                if cell.type == Colors.get_type_of_cells(color) and cell.state == CellStates.unmarked:
+                    self.compute_board_updates(color, x, y)
+                    if len(self.current_liberties) > 0:
+                        liberties.append(copy.deepcopy(self.current_liberties))
+                        self.current_liberties.clear()
+        self.restore_states()
+        return liberties
 
     def compute_board_updates(self, color: Colors, x: int, y: int):
         cell = self.get_cell(x, y)
@@ -184,7 +193,6 @@ class Board:
 
     def restore_states(self):
         self.current_groups.clear()
-        self.current_liberties.clear()
         for x in range(self.size_with_borders):
             for y in range(self.size_with_borders):
                 cell = self.get_cell(x, y)
@@ -199,12 +207,18 @@ class FinalizedBoard(Board):
         self.size_with_borders: int = board.size_with_borders
         self.players_territory: list[list[Cell]] = [[]]
         self.met_opponent = False
+        self.dead_cells: list[Cell] = []
 
-    def get_cell(self, x, y):
+    def get_cell(self, x, y) -> Cell:
         if not (self.size_with_borders > x >= 0 and self.size_with_borders > y >= 0):
             raise IndexError(f'Координаты слишком большие/маленькие! Полученные значения: {x - 1} и {y - 1}. '
                              f'Доступный диапазон: [0, {self.size}).')
         return self.board[y][x]
+
+    def mark_cell_as_dead(self, cell: Cell):
+        if cell.type == CellTypes.white or cell.type == CellTypes.black:
+            self.update_cell(cell, None, CellStates.dead)
+            self.dead_cells.append(cell)
 
     def count_territory(self, color: Colors):
         # Using Flood fill algorithm
@@ -232,8 +246,6 @@ class FinalizedBoard(Board):
                 self.met_opponent = True
                 return
             if cell.type == CellTypes.empty:
-                if cell.x == 1 and cell.y == 6:
-                    hello = 'world'
                 self.update_cell(cell, None, CellStates.marked)
                 self.players_territory[-1].append(cell)
                 # Walk ↑

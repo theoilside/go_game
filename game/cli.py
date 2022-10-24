@@ -85,7 +85,7 @@ class SingleplayerCLI(CLI):
         super().__init__()
         self.human_name: str | None = None
         self.human_color: Colors = Colors.black
-        self.AI_level: AILevel = AILevel.smart
+        self.AI_level: AILevel = AILevel.normal
         self.player_can_move: bool = True
 
     def start_singleplayer(self):
@@ -115,14 +115,16 @@ class SingleplayerCLI(CLI):
             raise NameError(f'Неверный ввод. Получено: {interface}. Допустимо: 0, 1')
 
     def _ask_for_AI_level(self):
-        print('? Выберите уровень искусственного интеллекта. Умный вам мешает, случайный ходит в случайные места.')
-        print('[умный — 0 (default); случайный — 1]')
+        print('? Выберите сложность игры.')
+        print('[простая — 0; нормальная — 1 (default); сложная — 2]')
         print('Ввод:', end=' ')
         interface = input()
-        if interface == '0' or interface == '':
-            self.AI_level = AILevel.smart
-        elif interface == '1':
-            self.AI_level = AILevel.random
+        if interface == '1' or interface == '':
+            self.AI_level = AILevel.normal
+        elif interface == '0':
+            self.AI_level = AILevel.easy
+        elif interface == '2':
+            self.AI_level = AILevel.hard
         else:
             raise NameError(f'Неверный ввод. Получено: {interface}. Допустимо: 0, 1')
 
@@ -153,7 +155,7 @@ class SingleplayerCLI(CLI):
                     continue
                 inputted_coords = interface.split(',')
                 try:
-                    if self.game.make_player_move(int(inputted_coords[0]), int(inputted_coords[1])).is_success:
+                    if self.game.request_move(int(inputted_coords[0]), int(inputted_coords[1])).is_success:
                         break
                 except IndexError as e:
                     print(e)
@@ -207,7 +209,7 @@ class MultiplayerCLI(CLI):
                     continue
                 inputted_coords = interface.split(',')
                 try:
-                    if self.game.make_player_move(int(inputted_coords[0]), int(inputted_coords[1])).is_success:
+                    if self.game.request_move(int(inputted_coords[0]), int(inputted_coords[1])).is_success:
                         break
                 except IndexError as e:
                     print(e)

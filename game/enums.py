@@ -59,6 +59,7 @@ class CellTypes(Enum):
 class CellStates(Enum):
     unmarked = '-'
     marked = '+'
+    dead = 'd'
 
     def get_opposite(self):
         if self.value == 'unmarked':
@@ -67,5 +68,6 @@ class CellStates(Enum):
 
 
 class AILevel(Enum):
-    random = 'random'
-    smart = 'smart'
+    easy = 'easy'
+    normal = 'normal'
+    hard = 'hard'

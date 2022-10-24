@@ -65,7 +65,7 @@ class GetPlayerNamesResponse:
         self.black_name = black_name
 
 
-class GetTypeOfCell:
+class MarkDeadResponse:
     def __init__(self, cell_type: CellTypes, highlighted: bool):
-        self.highlighted = highlighted
         self.cell_type = cell_type
+        self.highlighted = highlighted
