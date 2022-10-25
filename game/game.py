@@ -5,6 +5,7 @@ from .go import Board, FinalizedBoard
 from .ai import EasyAI, NormalAI, HardAI
 from .database import DatabaseAPI
 import logging
+import time
 
 KOMI = 6.5
 
