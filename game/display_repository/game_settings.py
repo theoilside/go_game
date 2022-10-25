@@ -17,7 +17,7 @@ class GameSettings:
         self.singleplayer_color: Colors = Colors.black
 
         self.current_color: Colors = Colors.black
-        self.game_api: Optional[SingleplayerGame | MultiplayerGame] = None
+        self.game_api: Optional[SingleplayerGame | MultiplayerGame] = SingleplayerGame()
         self.info_label: Optional[tk.Label] = None
         self.error_label: Optional[tk.Label] = None
         self.field_cell: List[List[tk.Label]] = []

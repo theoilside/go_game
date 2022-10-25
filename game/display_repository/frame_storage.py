@@ -1,5 +1,5 @@
 import tkinter as tk
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 from PIL import ImageTk, Image
 
 from .consts import *
@@ -12,6 +12,7 @@ class FrameStorage:
         self._window = window
         main_menu_bg_image = Image.open('./img/main_menu_bg.jpg')
         self._main_menu_bg = ImageTk.PhotoImage(main_menu_bg_image)
+        self.element_creator = ElementCreator()
 
         self.menu_frame = self._create_menu_frame()
         self.leaderboard_frame = self._create_menu_frame()
@@ -27,6 +28,8 @@ class FrameStorage:
         self.is_game_active = False
         self.leaderboard: List[Tuple[str, int]] = []
 
+        self.leaderboard_title: Optional[tk.Label] = None
+
     def _create_menu_frame(self):
         menu_frame = tk.Frame(self._window, width=WIDTH, height=HEIGHT)
         main_menu_bg_label = tk.Label(menu_frame, image=self._main_menu_bg)
@@ -35,12 +38,11 @@ class FrameStorage:
         menu_frame.pack_propagate(False)
         return menu_frame
 
-    def configure_frames(self, element_creator: ElementCreator,
-                         on_leaderboard_open, on_chosen_player_count, on_chosen_field_size, exit_game_by_user,
+    def configure_frames(self, on_leaderboard_open, on_chosen_player_count, on_chosen_field_size, exit_game_by_user,
                          on_chosen_ai, on_chosen_color):
 
-        create_label = element_creator.create_label
-        create_button = element_creator.create_button
+        create_label = self.element_creator.create_label
+        create_button = self.element_creator.create_button
 
         # Main frame config
         create_label('Го (囲碁)', self.menu_frame)
@@ -94,13 +96,8 @@ class FrameStorage:
                       callback=lambda: self.change_frame(self.rule_frame, self.menu_frame))
 
         # Frame with leaderboard config
-        if len(self.leaderboard) == 0:
-            create_label('Таблица лидеров пуста', self.leaderboard_frame, width=20)
-        else:
-            create_label('Таблица лидеров', self.leaderboard_frame, width=20)
-            for (name, score) in self.leaderboard:
-                create_label(f'{name} : {score}', self.leaderboard_frame, width=30)
-
+        create_label('Таблица лидеров', self.leaderboard_frame, width=20)
+        self.leaderboard_title = create_label('Здесь ничего нет :(', self.leaderboard_frame, width=30)
         create_button('← Назад', self.leaderboard_frame, width=10,
                       callback=lambda: self.change_frame(self.leaderboard_frame, self.menu_frame))
 
@@ -112,9 +109,20 @@ class FrameStorage:
                       callback=lambda: self.change_frame(self.escape_frame, self.game_frame))
 
         create_button('← Выйти в главное меню', self.escape_frame, width=20,
-                      callback=lambda: exit_game_by_user())
+                      callback=lambda: exit_game_by_user(self.escape_frame))
 
     @staticmethod
     def change_frame(old_frame, new_frame):
         old_frame.pack_forget()
         new_frame.pack()
+
+    def configure_leaderboard(self):
+        if len(self.leaderboard) == 0:
+            self.leaderboard_title.configure(text='Здесь ничего нет')
+            return
+
+        score_message = ''
+        for (name, score) in self.leaderboard:
+            score_message += f'{name} : {score}\n'
+
+        self.leaderboard_title.configure(text=score_message)

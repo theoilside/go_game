@@ -37,7 +37,7 @@ class Game:
             logging.debug(f"Фигура поставлена успешно")
             return MakeMoveByPlayerResponse(True, self.color_of_current_move, result_of_request.captured)
         logging.debug(f"Фигура не была поставлена")
-        return MakeMoveByPlayerResponse(False, self.color_of_current_move, 'Cannot make move!')
+        return MakeMoveByPlayerResponse(False, self.color_of_current_move)
 
     def _place_piece(self, x, y):
         Response = namedtuple('Response', ('is_permitted_move', 'captured'), defaults=(False, None))
@@ -103,12 +103,13 @@ class Game:
         else:
             self.black_points = self.board.count_territory(Colors.black) - self._captured_black
             self.white_points = self.board.count_territory(Colors.white) - self._captured_white + KOMI
-        return CountPointsResponse(self.black_points, self.white_points)
+        self.add_score_to_leaderboard(self.black_points, self.white_points)
+        return CountPointsResponse(self.black_points, self.white_points, True)
 
-    def add_score_to_leaderboard(self):
-        # TODO: Реализовать метод
-        # Добавляет результат метода get_score в бд лидерборда.
-        ...
+    def add_score_to_leaderboard(self, black_score: int, white_score: int) -> None:
+        db_api = DatabaseAPI()
+        db_api.add_new_result(self.black_name, black_score)
+        db_api.add_new_result(self.white_name, white_score)
 
     def get_player_names(self) -> GetPlayerNamesResponse:
         return GetPlayerNamesResponse(self.white_name, self.black_name)

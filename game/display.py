@@ -30,7 +30,7 @@ class Display:
         self.create_frames()
 
     def create_frames(self):
-        self.frame_storage.configure_frames(self.element_creator, self.on_leaderboard_open, self.on_chosen_player_count,
+        self.frame_storage.configure_frames(self.on_leaderboard_open, self.on_chosen_player_count,
                                             self.on_chosen_field_size, self.on_exit_game_by_user, self.on_chosen_ai,
                                             self.on_chosen_color)
         self.frame_storage.menu_frame.pack()
@@ -39,6 +39,7 @@ class Display:
         self.frame_storage.leaderboard = self.game_settings.game_api.get_leaderboard().leaderboard
         self.frame_storage.change_frame(self.frame_storage.menu_frame,
                                         self.frame_storage.leaderboard_frame)
+        self.frame_storage.configure_leaderboard()
 
     def on_chosen_player_count(self, game_type: TypesOfGames):
         self.game_settings.game_type = game_type
@@ -90,8 +91,7 @@ class Display:
             .start_multiplayer_game(self.game_settings.size, black_name, white_name)
         return start_response
 
-    def on_exit_game_by_user(self):
-        old_frame = self.frame_storage.escape_frame
+    def on_exit_game_by_user(self, old_frame):
         self.game_settings = GameSettings()
         self.frame_storage = FrameStorage(self.window)
         self.create_frames()
@@ -164,7 +164,7 @@ class Display:
         showinfo('Счёт',
                  f'Счёт чёрных: {score.black_points}\n'
                  f'Счёт белых: {score.white_points}')
-        self.on_exit_game_by_user()
+        self.on_exit_game_by_user(self.frame_storage.game_frame)
 
 
 def start_gui():

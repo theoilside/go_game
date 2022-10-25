@@ -1,13 +1,14 @@
 import sqlite3
 from typing import List, Tuple
 
+DB_NAME = 'database.db'
 TABLE_NAME = 'leaderboard'
 
 
 class DatabaseAPI:
     # TODO: Rewrite using WITH statement
     def __init__(self):
-        self.connection = sqlite3.connect('database.db')
+        self.connection = sqlite3.connect(DB_NAME)
         self._create_table()
 
     def add_new_result(self, name: str, score: int):
@@ -22,7 +23,8 @@ class DatabaseAPI:
     def get_from_table(self) -> List[Tuple[str, int]]:
         cursor = self.connection.cursor()
         sql_command = f'''SELECT name, score
-        FROM {TABLE_NAME}'''
+        FROM {TABLE_NAME}
+        ORDER BY score DESC'''
 
         cursor.execute(sql_command)
         data = cursor.fetchall()
