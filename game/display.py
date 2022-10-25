@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter.simpledialog import askstring
+from tkinter.messagebox import showinfo
 
 from .display_repository.element_creator import ElementCreator
 from .display_repository.game_settings import GameSettings
@@ -146,6 +147,7 @@ class Display:
 
             self.game_settings.grid_confirm_button()
             self.is_choose_dead_cells = True
+            return
 
         self.game_settings.current_color = pass_button_response.current_turn
         if self.game_settings.game_type == TypesOfGames.singleplayer:
@@ -157,6 +159,11 @@ class Display:
         cell_to_delete = self.game_settings.game_api.remove_pieces_at_coords().removed_cells
         for cell in cell_to_delete:
             self.image_storage.change_cell_image(CellTypes.empty, self.game_settings.field_cell[cell.y - 1][cell.x - 1])
+
+        score = self.game_settings.game_api.count_points()
+        showinfo('Счёт',
+                 f'Счёт чёрных: {score.black_points}\n'
+                 f'Счёт белых: {score.white_points}')
 
 
 def start_gui():

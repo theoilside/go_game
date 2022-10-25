@@ -87,7 +87,7 @@ class FrameStorage:
         # Frame with rules config
         create_label('Правила игры', self.rule_frame, width=20)
 
-        text = ' ' * 4 + f'\n\n{" " * 4}'.join(RULES)  # O_o
+        text = ' ' * 4 + f'\n\n{" " * 4}'.join(RULES)  # O_o Если писать \t, получается что-то некрасивое
 
         create_label(text, self.rule_frame, width=60, font=CALIBRI_SMALL_FONT, justify='left')
         create_button('← Назад', self.rule_frame, width=10,
