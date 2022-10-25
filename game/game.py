@@ -99,11 +99,11 @@ class Game:
     def count_points(self, black_territory: int = None, white_territory: int = None) -> CountPointsResponse:
         # Необязательные аргументы: заранее введенные площади черных/белых.
         if black_territory and white_territory:
-            self.black_points = black_territory - self._captured_black
-            self.white_points = white_territory - self._captured_white + KOMI
+            self.black_points = max(black_territory - self._captured_black, 0)
+            self.white_points = max(white_territory - self._captured_white + KOMI, 0)
         else:
-            self.black_points = self.board.count_territory(Colors.black) - self._captured_black
-            self.white_points = self.board.count_territory(Colors.white) - self._captured_white + KOMI
+            self.black_points = max(self.board.count_territory(Colors.black) - self._captured_black, 0)
+            self.white_points = max(self.board.count_territory(Colors.white) - self._captured_white + KOMI, 0)
         self.add_score_to_leaderboard(self.black_points, self.white_points)
         return CountPointsResponse(self.black_points, self.white_points, True)
 

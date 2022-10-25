@@ -33,7 +33,7 @@ class NormalAI(AI):
         if not random_group:
             return self.make_random_move()
         random_cell = random.choice(random_group)
-        return random_cell.x, random_cell.y
+        return random_cell.x - 1, random_cell.y - 1
 
     def get_weakest_coords(self, coords):
         min_amount_of_liberties = 4
