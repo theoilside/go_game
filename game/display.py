@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter.simpledialog import askstring
+from tkinter.messagebox import showinfo
 
 from .display_repository.element_creator import ElementCreator
 from .display_repository.game_settings import GameSettings
@@ -25,12 +26,11 @@ class Display:
         window.iconbitmap(ICON_PATH)
 
         self.is_choose_dead_cells: bool = False
-        self.dead_cells = []
 
         self.create_frames()
 
     def create_frames(self):
-        self.frame_storage.configure_frames(self.element_creator, self.on_leaderboard_open, self.on_chosen_player_count,
+        self.frame_storage.configure_frames(self.on_leaderboard_open, self.on_chosen_player_count,
                                             self.on_chosen_field_size, self.on_exit_game_by_user, self.on_chosen_ai,
                                             self.on_chosen_color)
         self.frame_storage.menu_frame.pack()
@@ -39,6 +39,7 @@ class Display:
         self.frame_storage.leaderboard = self.game_settings.game_api.get_leaderboard().leaderboard
         self.frame_storage.change_frame(self.frame_storage.menu_frame,
                                         self.frame_storage.leaderboard_frame)
+        self.frame_storage.configure_leaderboard()
 
     def on_chosen_player_count(self, game_type: TypesOfGames):
         self.game_settings.game_type = game_type
@@ -90,13 +91,13 @@ class Display:
             .start_multiplayer_game(self.game_settings.size, black_name, white_name)
         return start_response
 
-    def on_exit_game_by_user(self):
-        old_frame = self.frame_storage.escape_frame
+    def on_exit_game_by_user(self, old_frame):
         self.game_settings = GameSettings()
         self.frame_storage = FrameStorage(self.window)
         self.create_frames()
         self.frame_storage.change_frame(old_frame, self.frame_storage.menu_frame)
         self.frame_storage.is_game_active = False
+        self.is_choose_dead_cells = False
 
     def init_game_field(self):
         self.game_settings.init_game_state(self.frame_storage.game_frame, self.on_game_cell_pressed,
@@ -146,6 +147,7 @@ class Display:
 
             self.game_settings.grid_confirm_button()
             self.is_choose_dead_cells = True
+            return
 
         self.game_settings.current_color = pass_button_response.current_turn
         if self.game_settings.game_type == TypesOfGames.singleplayer:
@@ -157,6 +159,12 @@ class Display:
         cell_to_delete = self.game_settings.game_api.remove_pieces_at_coords().removed_cells
         for cell in cell_to_delete:
             self.image_storage.change_cell_image(CellTypes.empty, self.game_settings.field_cell[cell.y - 1][cell.x - 1])
+
+        score = self.game_settings.game_api.count_points()
+        showinfo('Счёт',
+                 f'Счёт чёрных: {score.black_points}\n'
+                 f'Счёт белых: {score.white_points}')
+        self.on_exit_game_by_user(self.frame_storage.game_frame)
 
 
 def start_gui():

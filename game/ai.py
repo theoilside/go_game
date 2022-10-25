@@ -6,15 +6,18 @@ class AI:
     def __init__(self, board):
         self.board = board
 
+    def get_move(self, color_of_current_move: Colors):
+        x = random.randint(0, self.board.size - 1)
+        y = random.randint(0, self.board.size - 1)
+        return x, y
+
 
 class EasyAI(AI):
     def __init__(self, board):
         super().__init__(board)
 
     def get_move(self, color_of_current_move: Colors):
-        x = random.randint(0, self.board.size - 1)
-        y = random.randint(0, self.board.size - 1)
-        return x, y
+        return super().get_move(color_of_current_move)
 
 
 class NormalAI(AI):
@@ -85,7 +88,5 @@ class HardAI(AI):
             random_liberty_cell = random.choice(random_group_of_liberties)
             x = random_liberty_cell.x - 1
             y = random_liberty_cell.y - 1
-        else:
-            x = random.randint(0, self.board.size - 1)
-            y = random.randint(0, self.board.size - 1)
-        return x, y
+            return x, y
+        return super().get_move(color_of_current_move)
