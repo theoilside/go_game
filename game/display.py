@@ -26,7 +26,6 @@ class Display:
         window.iconbitmap(ICON_PATH)
 
         self.is_choose_dead_cells: bool = False
-        self.dead_cells = []
 
         self.create_frames()
 
@@ -98,6 +97,7 @@ class Display:
         self.create_frames()
         self.frame_storage.change_frame(old_frame, self.frame_storage.menu_frame)
         self.frame_storage.is_game_active = False
+        self.is_choose_dead_cells = False
 
     def init_game_field(self):
         self.game_settings.init_game_state(self.frame_storage.game_frame, self.on_game_cell_pressed,
