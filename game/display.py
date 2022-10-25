@@ -164,6 +164,7 @@ class Display:
         showinfo('Счёт',
                  f'Счёт чёрных: {score.black_points}\n'
                  f'Счёт белых: {score.white_points}')
+        self.on_exit_game_by_user()
 
 
 def start_gui():

@@ -140,12 +140,13 @@ class SingleplayerGame(Game):
         self.color_of_human = color_of_human
         self.color_of_AI = color_of_human.get_opposite()
         response = super().start_game(size, black_name, white_name)
-        if ai_level == AILevel.hard:
-            self.AI = HardAI(self.board)
-        elif ai_level == AILevel.easy:
-            self.AI = EasyAI(self.board)
-        else:
-            self.AI = NormalAI(self.board)
+        match ai_level:
+            case AILevel.hard:
+                self.AI = HardAI(self.board)
+            case AILevel.easy:
+                self.AI = EasyAI(self.board)
+            case _:
+                self.AI = NormalAI(self.board)
         return response
 
     def make_ai_move(self):
