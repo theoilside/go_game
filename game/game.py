@@ -5,7 +5,7 @@ from .go import Board, FinalizedBoard
 from .ai import EasyAI, NormalAI, HardAI
 from .database import DatabaseAPI
 import logging
-import time
+import datetime
 
 KOMI = 6.5
 
@@ -109,6 +109,10 @@ class Game:
 
     def add_score_to_leaderboard(self, black_score: int, white_score: int) -> None:
         db_api = DatabaseAPI()
+        if self.black_name == 'Черные':
+            self.black_name = f'Черные {datetime.datetime.now().strftime("%d.%m.%Y %H:%M")}'
+        if self.white_name == 'Белые':
+            self.white_name = f'Белые {datetime.datetime.now().strftime("%d.%m.%Y %H:%M")}'
         db_api.add_new_result(self.black_name, black_score)
         db_api.add_new_result(self.white_name, white_score)
 
@@ -153,15 +157,20 @@ class SingleplayerGame(Game):
 
     def make_ai_move(self):
         logging.debug('Ход компьютера:')
+        attempts_counter = 0
         while True:
-            x, y = self.AI.get_move(self.color_of_current_move)
-            logging.debug(f'Компьютер пытается сходить в клетку {x}-{y}')
+            attempts_counter += 1
+            if attempts_counter < 5:
+                x, y = self.AI.get_move(self.color_of_current_move)
+                logging.debug(f'Компьютер пытается сходить в выгодную клетку {x}-{y}')
+            else:
+                x, y = self.AI.make_random_move()
+                logging.debug(f'Компьютер пытается сходить в случайную клетку {x}-{y}')
             result = self._place_piece(x, y)
             if result.is_permitted_move:
                 self.is_passed_last_turn = False
                 logging.debug(f'Компьютер сходил в клетку {x}-{y}')
                 return MakeMoveByAIResponse(x, y, self.color_of_current_move, result.captured)
-
 
 class MultiplayerGame(Game):
     def __init__(self):
