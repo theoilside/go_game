@@ -24,7 +24,8 @@ class DatabaseAPI:
         cursor = self.connection.cursor()
         sql_command = f'''SELECT name, score
         FROM {TABLE_NAME}
-        ORDER BY score DESC'''
+        ORDER BY score DESC
+        LIMIT 8'''
 
         cursor.execute(sql_command)
         data = cursor.fetchall()
