@@ -25,7 +25,7 @@ class DatabaseAPI:
         sql_command = f'''SELECT name, score
         FROM {TABLE_NAME}
         ORDER BY score DESC
-        LIMIT 8'''
+        LIMIT 10'''
 
         cursor.execute(sql_command)
         data = cursor.fetchall()
