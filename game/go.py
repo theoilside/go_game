@@ -19,10 +19,10 @@ class Cell:
 
 
 def generate_empty_board(size):
-    if size < 0:
-        raise ValueError(f'Size must be non-negative. Got {size}')
-    if size > 21:
-        raise ValueError(f'Size is too large, 21 is maximum. Got {size}')
+    if size < 1:
+        raise ValueError(f'Размер пустой доски должен быть больше, чем 1. Получено {size}')
+    if size > 19:
+        raise ValueError(f'Размер пустой доски должен быть меньше, чем 20. Получено {size}')
     board = []
     row = []
     for x in range(size):
@@ -78,7 +78,7 @@ class Board:
 
     def get_cell(self, x, y):
         if not (self.size_with_borders > x >= 0 and self.size_with_borders > y >= 0):
-            raise IndexError(f'Координаты слишком большие/маленькие! Полученные значения: {x - 1} и {y - 1}. '
+            raise ValueError(f'Координаты слишком большие/маленькие! Полученные значения: {x - 1} и {y - 1}. '
                              f'Доступный диапазон: [0, {self.size}).')
         return self.board[y][x]
 
