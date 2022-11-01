@@ -21,12 +21,12 @@ class ElementCreator:
         label.bind('<Configure>', lambda e: label.config(wraplength=label.winfo_width()))
         return label
 
-    def create_button(self, text, parent: tk.Frame, callback=None, font=CALIBRI_LARGE_FONT, width=16):
+    def create_button(self, text, parent: tk.Frame, callback=None, callback2=None, font=CALIBRI_LARGE_FONT, width=16):
         border = self._create_border(parent)
         button = tk.Button(border,
                            text=text,
                            font=font,
-                           command=callback,
+                           command=lambda: [callback(), callback2()],
                            bg=BUTTON_COLOR,
                            activebackground=BUTTON_PRESSED_COLOR,
                            width=width,

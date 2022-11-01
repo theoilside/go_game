@@ -32,7 +32,7 @@ class Display:
     def create_frames(self):
         self.frame_storage.configure_frames(self.on_leaderboard_open, self.on_chosen_player_count,
                                             self.on_chosen_field_size, self.on_exit_game_by_user, self.on_chosen_ai,
-                                            self.on_chosen_color)
+                                            self.on_chosen_color, self.on_leaderboard_clear)
         self.frame_storage.menu_frame.pack()
 
     def on_leaderboard_open(self):
@@ -40,6 +40,10 @@ class Display:
         self.frame_storage.change_frame(self.frame_storage.menu_frame,
                                         self.frame_storage.leaderboard_frame)
         self.frame_storage.configure_leaderboard()
+
+    def on_leaderboard_clear(self):
+        self.frame_storage.leaderboard.clear()
+        self.game_settings.game_api.clear_leaderboard()
 
     def on_chosen_player_count(self, game_type: TypesOfGames):
         self.game_settings.game_type = game_type
@@ -77,7 +81,7 @@ class Display:
         self.game_settings.change_pass_buttons()
 
     def config_singleplayer(self) -> StartGameResponse:
-        name = askstring('Имя', 'Введите ваше имя.\nПоле можно оставить пустым')
+        name = askstring('Имя игрока', 'Введите ваше имя для записи в лидерборд.\nЕсли поле оставить пустым, результат не будет записан')
         start_response = self.game_settings.game_api \
             .start_singleplayer_game(self.game_settings.size, name,
                                      ai_level=self.game_settings.ai_level,
@@ -85,8 +89,8 @@ class Display:
         return start_response
 
     def config_multiplayer(self) -> StartGameResponse:
-        black_name = askstring('Имя черных', 'Введите имя черного игрока.\nПоле можно оставить пустым')
-        white_name = askstring('Имя белых', 'Введите имя белого игрока.\nПоле можно оставить пустым')
+        black_name = askstring('Имя черных', 'Введите имя черного игрока для записи в лидерборд.\nЕсли поле оставить пустым, результат не будет записан')
+        white_name = askstring('Имя белых', 'Введите имя белого игрока для записи в лидерборд.\nЕсли поле оставить пустым, результат не будет записан')
         start_response = self.game_settings.game_api \
             .start_multiplayer_game(self.game_settings.size, black_name, white_name)
         return start_response
@@ -161,9 +165,9 @@ class Display:
             self.image_storage.change_cell_image(CellTypes.empty, self.game_settings.field_cell[cell.y - 1][cell.x - 1])
 
         score = self.game_settings.game_api.count_points()
-        showinfo('Счёт',
-                 f'Счёт чёрных: {score.black_points}\n'
-                 f'Счёт белых: {score.white_points}')
+        showinfo('Итоговый счет',
+                 f'Счет черных: {score.black_points}\n'
+                 f'Счет белых: {score.white_points}')
         self.on_exit_game_by_user(self.frame_storage.game_frame)
 
 

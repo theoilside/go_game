@@ -10,8 +10,8 @@ from ..enums import TypesOfGames, AILevel, Colors
 class FrameStorage:
     def __init__(self, window):
         self._window = window
-        main_menu_bg_image = Image.open('./img/main_menu_bg.jpg')
-        self._main_menu_bg = ImageTk.PhotoImage(main_menu_bg_image)
+        # main_menu_bg_image = Image.open('./img/main_menu_bg.jpg')
+        # self._main_menu_bg = ImageTk.PhotoImage(main_menu_bg_image)
         self.element_creator = ElementCreator()
 
         self.menu_frame = self._create_menu_frame()
@@ -33,14 +33,15 @@ class FrameStorage:
     def _create_menu_frame(self):
         menu_frame = tk.Frame(self._window, width=self._window.winfo_screenwidth(),
                               height=self._window.winfo_screenheight())
-        main_menu_bg_label = tk.Label(menu_frame, image=self._main_menu_bg)
+        main_menu_bg_label = tk.Label(menu_frame)
+        # main_menu_bg_label = tk.Label(menu_frame, image=self._main_menu_bg)
         main_menu_bg_label.place(x=0, y=0)
 
         menu_frame.pack_propagate(False)
         return menu_frame
 
     def configure_frames(self, on_leaderboard_open, on_chosen_player_count, on_chosen_field_size, exit_game_by_user,
-                         on_chosen_ai, on_chosen_color):
+                         on_chosen_ai, on_chosen_color, on_leaderboard_clear):
 
         create_label = self.element_creator.create_label
         create_button = self.element_creator.create_button
@@ -51,7 +52,7 @@ class FrameStorage:
                       callback=lambda: self.change_frame(self.menu_frame, self.players_count_frame))
         create_button('Лидерборд', self.menu_frame,
                       callback=on_leaderboard_open)
-        create_button('Правила игры', self.menu_frame,
+        create_button('Справка', self.menu_frame,
                       callback=lambda: self.change_frame(self.menu_frame, self.rule_frame))
         create_button('Выход', self.menu_frame, callback=lambda: self._window.quit())
 
@@ -88,17 +89,17 @@ class FrameStorage:
                       callback=lambda: self.change_frame(self.color_frame, self.ai_frame))
 
         # Frame with rules config
-        create_label('Правила игры', self.rule_frame, width=20)
+        text = ' ' * 4 + f'\n\n{" " * 4}'.join(RULES)
 
-        text = ' ' * 4 + f'\n\n{" " * 4}'.join(RULES)  # O_o Если писать \t, получается что-то некрасивое
-
-        create_label(text, self.rule_frame, width=60, font=CALIBRI_SMALL_FONT, justify='left')
+        create_label(text, self.rule_frame, width=60, font=CALIBRI_SMALL_FONT)
         create_button('← Назад', self.rule_frame, width=10,
                       callback=lambda: self.change_frame(self.rule_frame, self.menu_frame))
 
         # Frame with leaderboard config
         create_label('Таблица лидеров', self.leaderboard_frame, width=20)
         self.leaderboard_title = create_label('Здесь ничего нет :(', self.leaderboard_frame, width=30)
+        create_button('Очистить', self.leaderboard_frame, width=10,
+                      callback=on_leaderboard_clear, callback2=self.configure_leaderboard)
         create_button('← Назад', self.leaderboard_frame, width=10,
                       callback=lambda: self.change_frame(self.leaderboard_frame, self.menu_frame))
 
@@ -119,11 +120,11 @@ class FrameStorage:
 
     def configure_leaderboard(self):
         if len(self.leaderboard) == 0:
-            self.leaderboard_title.configure(text='Здесь ничего нет')
+            self.leaderboard_title.configure(text='Пока никто не сыграл :(')
             return
-
         score_message = ''
+        counter = 0
         for (name, score) in self.leaderboard:
-            score_message += f'{name} : {score}\n'
-
-        self.leaderboard_title.configure(text=score_message)
+            counter += 1
+            score_message += f'{counter}. {name} → {score}\n'
+        self.leaderboard_title.configure(text=score_message, justify='left')

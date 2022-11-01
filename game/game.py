@@ -69,6 +69,11 @@ class Game:
         leaderboard = db_api.get_from_table()
         return GetLeaderboardResponse(leaderboard)
 
+    @staticmethod
+    def clear_leaderboard():
+        db_api = DatabaseAPI()
+        db_api.delete_from_table()
+
     def _update_overall_captured(self, new_captured):
         if new_captured:
             white_captured = new_captured[0].type.name == 'white'
@@ -108,12 +113,17 @@ class Game:
 
     def add_score_to_leaderboard(self, black_score: int, white_score: int) -> None:
         db_api = DatabaseAPI()
-        if self.black_name == 'Черные':
-            self.black_name = f'Черные {datetime.datetime.now().strftime("%d.%m.%Y %H:%M")}'
-        if self.white_name == 'Белые':
-            self.white_name = f'Белые {datetime.datetime.now().strftime("%d.%m.%Y %H:%M")}'
-        db_api.add_new_result(self.black_name, black_score)
-        db_api.add_new_result(self.white_name, white_score)
+        if self.black_name == 'Черные' and self.white_name != 'Белые':
+            db_api.add_new_result(self.white_name, white_score)
+            # self.black_name = f'Черные {datetime.datetime.now().strftime("%d.%m.%Y %H:%M")}'
+        elif self.black_name != 'Черные' and self.white_name == 'Белые':
+            db_api.add_new_result(self.black_name, black_score)
+            # self.white_name = f'Белые {datetime.datetime.now().strftime("%d.%m.%Y %H:%M")}'
+        elif self.black_name != 'Черные' and self.white_name != 'Белые':
+            db_api.add_new_result(self.black_name, black_score)
+            db_api.add_new_result(self.white_name, white_score)
+        elif self.black_name == 'Черные' and self.white_name == 'Белые':
+            return
 
     def get_player_names(self) -> GetPlayerNamesResponse:
         return GetPlayerNamesResponse(self.white_name, self.black_name)

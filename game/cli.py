@@ -35,7 +35,8 @@ class CLI:
         interface = input()
         if interface == '0' or interface == '':
             dead_stones = self.ask_for_dead_stones()
-            self.game.remove_pieces_at_coords(dead_stones)
+            if dead_stones:
+                self.game.remove_pieces_at_coords(dead_stones)
             print('i Текущая игровая доска:')
             print(self.game.board)
         elif interface == '1':
