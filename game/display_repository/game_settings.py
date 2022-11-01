@@ -114,7 +114,7 @@ class GameSettings:
                          borderwidth=0,
                          highlightthickness=0,
                          )
-        score.grid(row=1, column=0, padx=20, rowspan=2)
+        score.grid(row=1, column=0, padx=20, rowspan=3)
         self.white_score = score
 
         pass_button = tk.Button(game_frame, text='ПАС', font='Calibri 34 bold', bg='white',
@@ -123,7 +123,7 @@ class GameSettings:
                                 command=on_pass_button_pressed)
         self.white_pass = pass_button
 
-        pass_button.grid(row=3, column=0, padx=20, rowspan=3)
+        pass_button.grid(row=4, column=0, padx=20, rowspan=5)
 
     def _create_black_state(self, game_frame, on_pass_button_pressed):
         name = tk.Label(game_frame,
@@ -144,7 +144,7 @@ class GameSettings:
                          borderwidth=0,
                          highlightthickness=0,
                          )
-        score.grid(row=1, column=self.size + 6, padx=20, rowspan=2)
+        score.grid(row=1, column=self.size + 6, padx=20, rowspan=3)
         self.black_score = score
 
         pass_button = tk.Button(game_frame, text='ПАС', font='Calibri 34 bold', bg='black',
@@ -153,7 +153,7 @@ class GameSettings:
                                 command=on_pass_button_pressed)
         self.black_pass = pass_button
 
-        pass_button.grid(row=3, column=self.size + 6, padx=20, rowspan=3)
+        pass_button.grid(row=4, column=self.size + 6, padx=20, rowspan=5)
 
     def update_score(self, for_white: int, for_black: int):
         self.white_score.configure(text=f'Захвачено:\n{for_black}')
