@@ -10,7 +10,6 @@ import datetime
 KOMI = 6.5
 
 
-# TODO: Rewrite with decorator
 class Game:
     def __init__(self):
         self.board: Board | FinalizedBoard | None = None
@@ -171,6 +170,7 @@ class SingleplayerGame(Game):
                 self.is_passed_last_turn = False
                 logging.debug(f'Компьютер сходил в клетку {x}-{y}')
                 return MakeMoveByAIResponse(x, y, self.color_of_current_move, result.captured)
+
 
 class MultiplayerGame(Game):
     def __init__(self):
