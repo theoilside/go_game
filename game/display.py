@@ -21,7 +21,7 @@ class Display:
         self.image_storage = ImageStorage()
         self.element_creator = ElementCreator()
 
-        window.geometry(f'{WIDTH}x{HEIGHT}')
+        window.geometry(f"{window.winfo_screenwidth()}x{window.winfo_screenheight()}+0+0")
         window.title('Игра «Го»')
         window.iconbitmap(ICON_PATH)
 

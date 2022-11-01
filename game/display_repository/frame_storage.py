@@ -31,7 +31,8 @@ class FrameStorage:
         self.leaderboard_title: Optional[tk.Label] = None
 
     def _create_menu_frame(self):
-        menu_frame = tk.Frame(self._window, width=WIDTH, height=HEIGHT)
+        menu_frame = tk.Frame(self._window, width=self._window.winfo_screenwidth(),
+                              height=self._window.winfo_screenheight())
         main_menu_bg_label = tk.Label(menu_frame, image=self._main_menu_bg)
         main_menu_bg_label.place(x=0, y=0)
 
