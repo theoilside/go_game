@@ -44,6 +44,7 @@ class Display:
     def on_leaderboard_clear(self):
         self.frame_storage.leaderboard.clear()
         self.game_settings.game_api.clear_leaderboard()
+        self.frame_storage.configure_leaderboard()
 
     def on_chosen_player_count(self, game_type: TypesOfGames):
         self.game_settings.game_type = game_type

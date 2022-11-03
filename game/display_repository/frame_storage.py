@@ -1,6 +1,5 @@
 import tkinter as tk
 from typing import List, Tuple, Optional
-from PIL import ImageTk, Image
 
 from .consts import *
 from .element_creator import ElementCreator
@@ -10,8 +9,6 @@ from ..enums import TypesOfGames, AILevel, Colors
 class FrameStorage:
     def __init__(self, window):
         self._window = window
-        # main_menu_bg_image = Image.open('./img/main_menu_bg.jpg')
-        # self._main_menu_bg = ImageTk.PhotoImage(main_menu_bg_image)
         self.element_creator = ElementCreator()
 
         self.menu_frame = self._create_menu_frame()
@@ -34,7 +31,6 @@ class FrameStorage:
         menu_frame = tk.Frame(self._window, width=self._window.winfo_screenwidth(),
                               height=self._window.winfo_screenheight())
         main_menu_bg_label = tk.Label(menu_frame)
-        # main_menu_bg_label = tk.Label(menu_frame, image=self._main_menu_bg)
         main_menu_bg_label.place(x=0, y=0)
 
         menu_frame.pack_propagate(False)
@@ -99,7 +95,7 @@ class FrameStorage:
         create_label('Таблица лидеров', self.leaderboard_frame, width=20)
         self.leaderboard_title = create_label('Здесь ничего нет :(', self.leaderboard_frame, width=30)
         create_button('Очистить', self.leaderboard_frame, width=10,
-                      callback=on_leaderboard_clear, callback2=self.configure_leaderboard)
+                      callback=on_leaderboard_clear)
         create_button('← Назад', self.leaderboard_frame, width=10,
                       callback=lambda: self.change_frame(self.leaderboard_frame, self.menu_frame))
 
