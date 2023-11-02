@@ -1,11 +1,12 @@
-from collections import namedtuple
-from .api_responses import *
-from .enums import Colors, CellStates, CellTypes, AILevel
-from .go import Board, FinalizedBoard
-from .ai import EasyAI, NormalAI, HardAI
-from .database import DatabaseAPI
-import logging
 import datetime
+import logging
+from collections import namedtuple
+
+from .ai import EasyAI, HardAI, NormalAI
+from .api_responses import *
+from .database import DatabaseAPI
+from .enums import AILevel, CellStates, CellTypes, Colors
+from .go import Board, FinalizedBoard
 
 KOMI = 6.5
 

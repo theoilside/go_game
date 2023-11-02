@@ -1,9 +1,9 @@
 import tkinter as tk
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
 
+from ..enums import AILevel, Colors, TypesOfGames
 from .consts import *
 from .element_creator import ElementCreator
-from ..enums import TypesOfGames, AILevel, Colors
 
 
 class FrameStorage:

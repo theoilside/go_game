@@ -1,7 +1,7 @@
-from unittest import TestCase
 import unittest
-from game.go import *
+from unittest import TestCase
 
+from game.go import *
 
 BORDER = lambda x, y: Cell(CellTypes.border, CellStates.unmarked, x, y)
 EMPTY = lambda x, y: Cell(CellTypes.empty, CellStates.unmarked, x, y)

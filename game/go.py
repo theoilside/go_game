@@ -1,6 +1,8 @@
 from __future__ import annotations
+
 import copy
 from collections import namedtuple
+
 from game.enums import *
 
 

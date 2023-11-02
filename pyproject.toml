@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "go-game"
+version = "1.0.1"
+description = "A simple Go game"
+authors = ["Mikhail Lanets, Artemiy Kurganov"]
+license = "MIT License (c) 2023"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.group.dev.dependencies]
+SQLite3-0611 = "^0.0.1"
+typing = "^3.10.0.0"
+Everything-Tkinter = "^0.2"
+enum = "^0.4.7"
+logging = "^0.4.9.6"
+collections2 = "^0.3.0"
+copy-env = "^0.1.2"
+future = "^0.18.3"
+DateTime = "^5.2"
+random2 = "^1.0.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

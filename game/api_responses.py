@@ -1,5 +1,6 @@
-from typing import Optional, List, Tuple
-from game.enums import Colors, CellTypes
+from typing import List, Optional, Tuple
+
+from game.enums import CellTypes, Colors
 from game.go import Cell
 
 

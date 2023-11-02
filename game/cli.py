@@ -1,6 +1,7 @@
-from .game import SingleplayerGame, MultiplayerGame
-from .enums import Colors, AILevel
 import re
+
+from .enums import AILevel, Colors
+from .game import MultiplayerGame, SingleplayerGame
 
 
 class CLI:

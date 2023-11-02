@@ -1,10 +1,10 @@
-import logging
 import datetime
-import os
 import json
+import logging
+import os
 
-from game.display import start_gui
 import game.cli
+from game.display import start_gui
 
 PATH_TO_LOGS = './logs'
 PATH_TO_CONFIG = './config.json'

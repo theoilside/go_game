@@ -1,15 +1,15 @@
 import tkinter as tk
-from tkinter.simpledialog import askstring
 from tkinter.messagebox import showinfo
+from tkinter.simpledialog import askstring
 
+from .api_responses import *
+from .display_repository.consts import *
 from .display_repository.element_creator import ElementCreator
+from .display_repository.frame_storage import FrameStorage
 from .display_repository.game_settings import GameSettings
 from .display_repository.image_storage import ImageStorage
-from .api_responses import *
 from .enums import AILevel
 from .go import TypesOfGames
-from .display_repository.consts import *
-from .display_repository.frame_storage import FrameStorage
 
 
 class Display:

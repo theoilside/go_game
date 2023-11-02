@@ -1,12 +1,13 @@
-from typing import Optional, List
 import tkinter as tk
+from typing import List, Optional
 
-from game.enums import TypesOfGames, Colors, AILevel, CellTypes
-from game.game import SingleplayerGame, MultiplayerGame
-from .consts import *
-from .image_storage import ImageStorage
+from game.enums import AILevel, CellTypes, Colors, TypesOfGames
+from game.game import MultiplayerGame, SingleplayerGame
+
 from ..api_responses import MakeMoveByAIResponse
 from ..go import Cell
+from .consts import *
+from .image_storage import ImageStorage
 
 
 class GameSettings:

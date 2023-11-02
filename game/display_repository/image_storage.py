@@ -1,6 +1,7 @@
 import tkinter as tk
-from .consts import *
+
 from ..enums import CellTypes
+from .consts import *
 
 
 class ImageStorage:
